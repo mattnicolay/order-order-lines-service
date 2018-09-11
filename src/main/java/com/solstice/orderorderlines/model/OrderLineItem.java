@@ -10,30 +10,32 @@ import javax.persistence.Transient;
 
 @Entity
 public class OrderLineItem {
+
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private long id;
   @ManyToOne
   @JoinColumn(name = "productId")
-  private Product product;
+  private long productId;
   private int quantity;
   private double price;
   @Transient
   private double totalPrice;
   @ManyToOne
   @JoinColumn(name = "shipmentId")
-  private Shipment shipment;
+  private long shipmentId;
   @ManyToOne
   @JoinColumn(name = "orderId")
   private Order order;
 
-  public OrderLineItem(){}
+  public OrderLineItem() {
+  }
 
-  public OrderLineItem(Product product, int quantity, double price,
-      Shipment shipment, Order order) {
-    this.product = product;
+  public OrderLineItem(long productId, int quantity, double price,
+      long shipmentId, Order order) {
+    this.productId = productId;
     this.quantity = quantity;
-    this.shipment = shipment;
+    this.shipmentId = shipmentId;
     this.order = order;
     setPrice();
     setTotalPrice();
@@ -47,12 +49,12 @@ public class OrderLineItem {
     this.id = id;
   }
 
-  public Product getProduct() {
-    return product;
+  public long getProductId() {
+    return productId;
   }
 
-  public void setProduct(Product product) {
-    this.product = product;
+  public void setProductId(long productId) {
+    this.productId = productId;
     setPrice();
   }
 
@@ -70,7 +72,6 @@ public class OrderLineItem {
   }
 
   public void setPrice() {
-    price = product.getPrice();
     setTotalPrice();
   }
 
@@ -79,17 +80,16 @@ public class OrderLineItem {
     return totalPrice;
   }
 
-  public Shipment getShipment() {
-    return shipment;
+  public long getShipmentId() {
+    return shipmentId;
   }
 
-  public void setShipment(Shipment shipment) {
-    this.shipment = shipment;
-    this.shipment.addOrderLineItem(this);
+  public void setShipmentId(long shipmentId) {
+    this.shipmentId = shipmentId;
   }
 
   public void setTotalPrice() {
-    totalPrice = price*quantity;
+    totalPrice = price * quantity;
   }
 
   public Order getOrder() {
@@ -99,11 +99,6 @@ public class OrderLineItem {
   public void setOrder(Order order) {
     this.order = order;
     this.order.addOrderLineItem(this);
-  }
-
-  public void removeFromParents() {
-    shipment.removeOrderLineItem(this);
-    order.removeOrderLineItem(this);
   }
 }
 
