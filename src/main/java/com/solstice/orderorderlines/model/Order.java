@@ -101,7 +101,9 @@ public class Order {
 
   private void setTotalPrice() {
     totalPrice = 0;
-    this.orderLineItems.forEach(o -> totalPrice += o.getTotalPrice());
+    if (orderLineItems != null) {
+      this.orderLineItems.forEach(o -> totalPrice += o.getTotalPrice());
+    }
   }
 }
 

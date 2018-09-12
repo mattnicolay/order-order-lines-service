@@ -14,29 +14,22 @@ public class OrderLineItem {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private long id;
-  @ManyToOne
-  @JoinColumn(name = "productId")
   private long productId;
   private int quantity;
   private double price;
   @Transient
   private double totalPrice;
-  @ManyToOne
-  @JoinColumn(name = "shipmentId")
   private long shipmentId;
-  @ManyToOne
-  @JoinColumn(name = "orderId")
-  private Order order;
 
   public OrderLineItem() {
   }
 
   public OrderLineItem(long productId, int quantity, double price,
-      long shipmentId, Order order) {
+      long shipmentId) {
     this.productId = productId;
     this.quantity = quantity;
+    this.price = price;
     this.shipmentId = shipmentId;
-    this.order = order;
     setPrice();
     setTotalPrice();
   }
@@ -90,15 +83,6 @@ public class OrderLineItem {
 
   public void setTotalPrice() {
     totalPrice = price * quantity;
-  }
-
-  public Order getOrder() {
-    return order;
-  }
-
-  public void setOrder(Order order) {
-    this.order = order;
-    this.order.addOrderLineItem(this);
   }
 }
 

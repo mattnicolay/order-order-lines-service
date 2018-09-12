@@ -1,0 +1,25 @@
+server:
+  port:
+    8083
+
+spring:
+  datasource:
+    driverClassName:
+      com.mysql.jdbc.Driver
+    url:
+      jdbc:mysql://localhost:3306/amazon?allowPublicKeyRetrieval=true&useSSL=false
+    username:
+      dbuser
+    password:
+      dbpassword
+
+  jpa:
+    generate-ddl:
+      true
+    hibernate:
+      ddl-auto:
+        create
+    properties:
+      hibernate:
+        dialect:
+          org.hibernate.dialect.MySQL5Dialect
