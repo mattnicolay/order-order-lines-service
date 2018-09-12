@@ -22,7 +22,6 @@ public class Order {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private long orderNumber;
   private long accountId;
-  @Temporal(TemporalType.TIMESTAMP)
   private LocalDateTime orderDate;
   private long shippingAddressId;
   @OneToMany

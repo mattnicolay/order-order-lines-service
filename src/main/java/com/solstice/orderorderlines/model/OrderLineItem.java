@@ -1,14 +1,32 @@
 package com.solstice.orderorderlines.model;
 
+import javax.persistence.ColumnResult;
+import javax.persistence.ConstructorResult;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
+import javax.persistence.NamedNativeQuery;
+import javax.persistence.SqlResultSetMapping;
 import javax.persistence.Transient;
 
 @Entity
+@SqlResultSetMapping(name="OrderLineItemFromOrderMapping", classes = {
+    @ConstructorResult(targetClass = OrderLineItem.class,
+        columns = {
+            @ColumnResult(name="product_id", type=Long.class),
+            @ColumnResult(name="quantity", type=Integer.class),
+            @ColumnResult(name="price", type=Double.class),
+            @ColumnResult(name="shipment_id", type=Long.class),
+        })
+})
+@NamedNativeQuery(
+    name = "OrderLineItem.findOrderLineItemByIdAndOrderId",
+    query = "select product_id, quantity, price, shipment_id "
+        + "from order_line_item "
+        + "where id = :id and order_id = :orderId",
+    resultSetMapping = "OrderLineItemFromOrderMapping"
+)
 public class OrderLineItem {
 
   @Id

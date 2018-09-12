@@ -39,6 +39,8 @@ dependencies {
     compile('org.springframework.cloud:spring-cloud-starter-openfeign')
     runtime('mysql:mysql-connector-java')
     testCompile('org.springframework.boot:spring-boot-starter-test')
+    testCompile group: 'com.github.springtestdbunit', name: 'spring-test-dbunit', version: '1.2.0'
+    testCompile group: 'org.dbunit', name: 'dbunit', 'version':'2.5.0'
 }
 
 dependencyManagement {
