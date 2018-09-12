@@ -96,7 +96,7 @@ public class OrderOrderLineService {
     try {
       order = objectMapper.readValue(json, Order.class);
     } catch (IOException e) {
-      logger.error("IOException thrown in getAccountFromJson: {}", e.toString());
+      logger.error("IOException thrown in getOrderFromJson: {}", e.toString());
     }
     return order;
   }
@@ -106,7 +106,7 @@ public class OrderOrderLineService {
     try {
       orderLineItem = objectMapper.readValue(json, OrderLineItem.class);
     } catch (IOException e) {
-      logger.error("IOException thrown in getAccountFromJson: {}", e.toString());
+      logger.error("IOException thrown in getOrderLineItemFromJson: {}", e.toString());
     }
     return orderLineItem;
   }
