@@ -3,9 +3,8 @@ package com.solstice.orderorderlines.controller;
 import com.solstice.orderorderlines.model.Order;
 import com.solstice.orderorderlines.model.OrderLineItem;
 import com.solstice.orderorderlines.service.OrderOrderLineService;
-import java.util.Arrays;
+import java.io.IOException;
 import java.util.List;
-import javax.ws.rs.Path;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -39,7 +38,7 @@ public class OrderOrderLineController {
   }
 
   @PostMapping
-  public ResponseEntity<Order> createOrder(@RequestBody String body) {
+  public ResponseEntity<Order> createOrder(@RequestBody String body) throws IOException {
     Order order = orderOrderLineService.createOrder(body);
     return new ResponseEntity<>(
         order,
@@ -49,7 +48,8 @@ public class OrderOrderLineController {
   }
 
   @PutMapping("/{id}")
-  public ResponseEntity<Order> updateOrder(@PathVariable("id") long id, @RequestBody String body) {
+  public ResponseEntity<Order> updateOrder(@PathVariable("id") long id, @RequestBody String body)
+      throws IOException {
     Order order = orderOrderLineService.updateOrder(id, body);
     return new ResponseEntity<>(
         order,
@@ -79,7 +79,8 @@ public class OrderOrderLineController {
   }
 
   @PostMapping("/{id}/lines")
-  public ResponseEntity<OrderLineItem> createOrderLineItem(@PathVariable("id") long id, @RequestBody String body) {
+  public ResponseEntity<OrderLineItem> createOrderLineItem(@PathVariable("id") long id, @RequestBody String body)
+      throws IOException {
     OrderLineItem orderLineItem = orderOrderLineService.createOrderLineItem(id, body);
     return new ResponseEntity<>(
         orderLineItem,
@@ -92,7 +93,7 @@ public class OrderOrderLineController {
   public ResponseEntity<OrderLineItem> updateOrderLineItem(
       @PathVariable("orderId") long orderId,
       @PathVariable("orderLineId") long orderLineId,
-      @RequestBody String body) {
+      @RequestBody String body) throws IOException {
     OrderLineItem orderLineItem = orderOrderLineService.updateOrderLineItem(orderId, orderLineId, body);
     return new ResponseEntity<>(
         orderLineItem,

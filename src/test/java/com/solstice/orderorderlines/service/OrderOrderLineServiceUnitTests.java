@@ -16,6 +16,7 @@ import com.solstice.orderorderlines.dao.OrderLineItemRepository;
 import com.solstice.orderorderlines.dao.OrderRepository;
 import com.solstice.orderorderlines.model.Order;
 import com.solstice.orderorderlines.model.OrderLineItem;
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -23,8 +24,6 @@ import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.InjectMocks;
-import org.mockito.junit.MockitoJUnitRunner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -88,20 +87,19 @@ public class OrderOrderLineServiceUnitTests {
   }
 
   @Test
-  public void createOrder_ValidJson_ReturnsCreatedOrder() {
+  public void createOrder_ValidJson_ReturnsCreatedOrder() throws IOException {
     Order order1 = getOrder1();
     Order order = orderOrderLineService.createOrder(toJson(order1));
-
     assertThatOrdersAreEqual(order, order1);
   }
 
-  @Test
-  public void createOrders_InvalidJson_ReturnsNull() {
-    assertThat(orderOrderLineService.createOrder("{wrong)"), is(nullValue()));
+  @Test(expected = IOException.class)
+  public void createOrder_InvalidJson_ThrowsIOException() throws IOException {
+    orderOrderLineService.createOrder("{wrong)");
   }
 
   @Test
-  public void updateOrder_ValidIdAndJson_ReturnsOrder() {
+  public void updateOrder_ValidIdAndJson_ReturnsOrder() throws IOException {
     Order order1 = getOrder1();
     when(orderRepository.findByOrderNumber(1)).thenReturn(order1);
     Order order = orderOrderLineService.updateOrder(1, toJson(order1));
@@ -110,13 +108,13 @@ public class OrderOrderLineServiceUnitTests {
   }
 
   @Test
-  public void updateOrder_InvalidIdAndValidJson_ReturnsNull() {
+  public void updateOrder_InvalidIdAndValidJson_ReturnsNull() throws IOException {
     assertThat(orderOrderLineService.updateOrder(2, toJson(getOrder1())), is(nullValue()));
   }
 
-  @Test
-  public void updateOrder_ValidIdAndInvalidJson_ReturnsNull() {
-    assertThat(orderOrderLineService.updateOrder(1, "{wrong format)"), is(nullValue()));
+  @Test(expected = IOException.class)
+  public void updateOrder_ValidIdAndInvalidJson_ThrowsIOException() throws IOException {
+    orderOrderLineService.updateOrder(1, "{wrong format)");
   }
 
   @Test
@@ -161,7 +159,7 @@ public class OrderOrderLineServiceUnitTests {
   }
 
   @Test
-  public void createOrderLineItem_ValidIdAndJson_ReturnsCreatedOrder() {
+  public void createOrderLineItem_ValidIdAndJson_ReturnsCreatedOrder() throws IOException {
     OrderLineItem orderLineItem1 = getOrderLineItem1();
     when(orderRepository.findByOrderNumber(1)).thenReturn(getOrder1());
     OrderLineItem orderLineItem = orderOrderLineService.createOrderLineItem(1, toJson(orderLineItem1));
@@ -169,18 +167,20 @@ public class OrderOrderLineServiceUnitTests {
     assertThatOrderLineItemsAreEqual(orderLineItem, orderLineItem1);
   }
 
-  @Test
-  public void updateOrderLineItem_InvalidId_ReturnsNull() {
-    assertThat(orderOrderLineService.createOrderLineItem(2, toJson(getOrder1())), is(nullValue()));
+  @Test(expected = IOException.class)
+  public void createOrderLineItem_InvalidJson_ThrowsIOException() throws IOException {
+    when(orderRepository.findByOrderNumber(1)).thenReturn(getOrder1());
+    orderOrderLineService.createOrderLineItem(1, "{wrong)");
   }
 
   @Test
-  public void createOrderLineItem_InvalidJson_ReturnsNull() {
-    assertThat(orderOrderLineService.createOrderLineItem(1, "{wrong)"), is(nullValue()));
+  public void createOrderLineItem_InvalidId_ReturnsNull() throws IOException {
+    assertThat(orderOrderLineService.createOrderLineItem(2, toJson(getOrderLineItem1())), is(nullValue()));
   }
 
+
   @Test
-  public void updateOrderLineItem_ValidIdAndJson_ReturnsOrder() {
+  public void updateOrderLineItem_ValidIdAndJson_ReturnsOrder() throws IOException {
     OrderLineItem orderLineItem1 = getOrderLineItem1();
     when(orderLineItemRepository.findOrderLineItemByIdAndOrderId(1, 1))
         .thenReturn(orderLineItem1);
@@ -191,15 +191,15 @@ public class OrderOrderLineServiceUnitTests {
   }
 
   @Test
-  public void updateOrderLineItem_InvalidIdAndValidJson_ReturnsNull() {
+  public void updateOrderLineItem_InvalidIdAndValidJson_ReturnsNull() throws IOException {
     assertThat(orderOrderLineService
         .updateOrderLineItem(3, 2, toJson(getOrderLineItem1())), is(nullValue()));
   }
 
-  @Test
-  public void updateOrderLineItem_ValidIdAndInvalidJson_ReturnsNull() {
-    assertThat(orderOrderLineService
-        .updateOrderLineItem(1, 1, "{wrong format)"), is(nullValue()));
+  @Test(expected = IOException.class)
+  public void updateOrderLineItem_ValidIdAndInvalidJson_ThrowsIOException() throws IOException {
+    when(orderLineItemRepository.findOrderLineItemByIdAndOrderId(1,1)).thenReturn(getOrderLineItem1());
+    orderOrderLineService.updateOrderLineItem(1, 1, "{wrong format)");
   }
 
   @Test
