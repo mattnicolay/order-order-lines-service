@@ -54,14 +54,7 @@ public class OrderOrderLineServiceUnitTests {
 
     assertThat(orders, is(notNullValue()));
     assertFalse(orders.isEmpty());
-    orders.forEach(order -> {
-      assertThat(order, is(notNullValue()));
-      assertThat(order.getAccountId(), is(notNullValue()));
-      assertThat(order.getOrderDate(), is(notNullValue()));
-      assertThat(order.getShippingAddressId(), is(notNullValue()));
-      assertThat(order.getOrderLineItems(), is(notNullValue()));
-      assertThat(order.getTotalPrice(), is(notNullValue()));
-    });
+    assertThatOrderListElementsAreNotEmpty(orders);
   }
 
   @Test
@@ -219,6 +212,25 @@ public class OrderOrderLineServiceUnitTests {
         is(nullValue()));
   }
 
+  @Test
+  public void getOrdersByAccountId_ValidId_ReturnsListOfOrders() {
+    when(orderRepository.findAllByAccountId(1)).thenReturn(getOrders());
+    List<Order> orders = orderOrderLineService.getOrdersByAccountId(1);
+
+    assertThat(orders, is(notNullValue()));
+    assertFalse(orders.isEmpty());
+    assertThatOrderListElementsAreNotEmpty(orders);
+  }
+
+  @Test
+  public void getOrdersByAccountId_InvalidId_ReturnsEmptyListOfOrders() {
+    List<Order> orders = orderOrderLineService.getOrdersByAccountId(-1);
+
+    assertThat(orders, is(notNullValue()));
+    assertTrue(orders.isEmpty());
+  }
+
+
   private String toJson(Object value) {
     String result = null;
     ObjectMapper objectMapper = new ObjectMapper();
@@ -256,6 +268,18 @@ public class OrderOrderLineServiceUnitTests {
     assertThat(actual.getShipmentId(), is(expected.getShipmentId()));
     assertThat(actual.getTotalPrice(), is(notNullValue()));
     assertThat(actual.getTotalPrice(), is(expected.getTotalPrice()));
+  }
+
+
+  private void assertThatOrderListElementsAreNotEmpty(List<Order> orders) {
+    orders.forEach(order -> {
+      assertThat(order, is(notNullValue()));
+      assertThat(order.getAccountId(), is(notNullValue()));
+      assertThat(order.getOrderDate(), is(notNullValue()));
+      assertThat(order.getShippingAddressId(), is(notNullValue()));
+      assertThat(order.getOrderLineItems(), is(notNullValue()));
+      assertThat(order.getTotalPrice(), is(notNullValue()));
+    });
   }
 
   private List<Order> getOrders() {

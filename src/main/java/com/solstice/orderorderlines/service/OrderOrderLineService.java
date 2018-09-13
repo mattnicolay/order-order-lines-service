@@ -89,4 +89,8 @@ public class OrderOrderLineService {
     orderLineItemRepository.delete(deletedOrderLineItem);
     return deletedOrderLineItem;
   }
+
+  public List<Order> getOrdersByAccountId(long accountId) {
+    return orderRepository.findAllByAccountId(accountId);
+  }
 }

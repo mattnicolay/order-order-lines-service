@@ -6,6 +6,7 @@ import static org.junit.Assert.*;
 
 import com.github.springtestdbunit.DbUnitTestExecutionListener;
 import com.github.springtestdbunit.annotation.DatabaseSetup;
+import com.solstice.orderorderlines.model.Order;
 import com.solstice.orderorderlines.model.OrderLineItem;
 import java.util.List;
 import org.junit.Test;
@@ -48,9 +49,17 @@ public class OrderRepositoryTest {
 
   @Test
   public void findOrderLineItemsById_InvalidId_ReturnsEmptyOrderLineItemsList() {
-    List<OrderLineItem> orderLineItems = orderRepository.findOrderLineItemsByOrderNumber(3);
+    List<OrderLineItem> orderLineItems = orderRepository.findOrderLineItemsByOrderNumber(4);
 
     assertThat(orderLineItems, is(notNullValue()));
     assertTrue(orderLineItems.isEmpty());
+  }
+
+  @Test
+  public void findAllByAccountId_ValidId_ReturnsListOfOrders() {
+    List<Order> orders = orderRepository.findAllByAccountId(1);
+
+    assertThat(orders, is(notNullValue()));
+    assertThat(orders.size(), is(2));
   }
 }

@@ -17,7 +17,10 @@ import com.solstice.orderorderlines.model.Order;
 import com.solstice.orderorderlines.model.OrderLineItem;
 import com.solstice.orderorderlines.service.OrderOrderLineService;
 import java.io.IOException;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -58,12 +61,23 @@ public class OrderOrderLineControllerUnitTests {
 
   @Test
   public void getOrdersSuccessTest() {
-    when(orderOrderLineService.getOrders()).thenReturn(Arrays.asList(new Order()));
-    mockMvcPerform(GET, "/orders", 200, toJson(Arrays.asList(new Order())));
+    when(orderOrderLineService.getOrders()).thenReturn(getOrders());
+    mockMvcPerform(GET, "/orders", 200, toJson(getOrders()));
   }
 
   @Test
   public void getOrdersFailureTest() {
+    mockMvcPerform(GET, "/orders", 404, "");
+  }
+
+  @Test
+  public void getOrdersByAccountId_ValidId_Code200ReturnsListOfOrders() {
+    when(orderOrderLineService.getOrdersByAccountId(1)).thenReturn(getOrders());
+    mockMvcPerform(GET, "/orders?accountId=1", 200, toJson(getOrders()));
+  }
+
+  @Test
+  public void getOrdersByAccountId_InvalidId_Code404EmptyResponse() {
     mockMvcPerform(GET, "/orders", 404, "");
   }
 
@@ -243,5 +257,49 @@ public class OrderOrderLineControllerUnitTests {
     } catch (Exception e) {
       logger.error("Exception thrown: {}", e.toString());
     }
+  }
+
+  private List<Order> getOrders() {
+    return Arrays.asList(getOrder1(), getOrder2());
+  }
+
+  private List<OrderLineItem> getOrderLineItems() {
+    return Arrays.asList(getOrderLineItem1(), getOrderLineItem2(), getOrderLineItem3());
+  }
+
+  private Order getOrder1() {
+    List<OrderLineItem> list = new ArrayList<>();
+    list.add(getOrderLineItem1());
+    list.add(getOrderLineItem3());
+    return new Order(
+        1,
+        LocalDateTime.of(2018,9,12,2,0),
+        1,
+        list
+    );
+  }
+
+  private Order getOrder2() {
+    List<OrderLineItem> list = new ArrayList<>();
+    list.add(getOrderLineItem1());
+    list.add(getOrderLineItem2());
+    return new Order(
+        1,
+        LocalDateTime.of(2018,9,9,5,30),
+        2,
+        list
+    );
+  }
+
+  private OrderLineItem getOrderLineItem1() {
+    return new OrderLineItem(1,3, 25.00, 1);
+  }
+
+  private OrderLineItem getOrderLineItem2() {
+    return new OrderLineItem(2,5, 15.00, 2);
+  }
+
+  private OrderLineItem getOrderLineItem3() {
+    return new OrderLineItem(3,8, 40.00, 3);
   }
 }

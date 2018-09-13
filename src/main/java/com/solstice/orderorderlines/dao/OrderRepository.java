@@ -15,4 +15,6 @@ public interface OrderRepository extends CrudRepository<Order, Long> {
 
   @Query("select o.orderLineItems from Order o where o.id = :id")
   List<OrderLineItem> findOrderLineItemsByOrderNumber(@Param("id") long id);
+
+  List<Order> findAllByAccountId(long accountId);
 }
