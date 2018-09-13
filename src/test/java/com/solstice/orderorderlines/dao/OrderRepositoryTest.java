@@ -57,9 +57,10 @@ public class OrderRepositoryTest {
 
   @Test
   public void findAllByAccountId_ValidId_ReturnsListOfOrders() {
-    List<Order> orders = orderRepository.findAllByAccountId(1);
+    List<Order> orders = orderRepository.findAllByAccountIdOrderByOrderDate(1);
 
     assertThat(orders, is(notNullValue()));
     assertThat(orders.size(), is(2));
+    assertThat(orders.get(0).getOrderNumber(), is(2L));
   }
 }

@@ -214,7 +214,7 @@ public class OrderOrderLineServiceUnitTests {
 
   @Test
   public void getOrdersByAccountId_ValidId_ReturnsListOfOrders() {
-    when(orderRepository.findAllByAccountId(1)).thenReturn(getOrders());
+    when(orderRepository.findAllByAccountIdOrderByOrderDate(1)).thenReturn(getOrders());
     List<Order> orders = orderOrderLineService.getOrdersByAccountId(1);
 
     assertThat(orders, is(notNullValue()));

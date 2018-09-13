@@ -51,6 +51,10 @@ public class OrderOrderLineController {
     );
   }
 
+  public ResponseEntity<Order> getOrderDetails(@PathVariable("id") long id) {
+    return null;
+  }
+
   @PutMapping("/{id}")
   public ResponseEntity<Order> updateOrder(@PathVariable("id") long id, @RequestBody String body)
       throws IOException {

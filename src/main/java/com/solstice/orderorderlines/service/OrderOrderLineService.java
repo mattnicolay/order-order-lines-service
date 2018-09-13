@@ -7,8 +7,6 @@ import com.solstice.orderorderlines.model.Order;
 import com.solstice.orderorderlines.model.OrderLineItem;
 import java.io.IOException;
 import java.util.List;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -91,6 +89,6 @@ public class OrderOrderLineService {
   }
 
   public List<Order> getOrdersByAccountId(long accountId) {
-    return orderRepository.findAllByAccountId(accountId);
+    return orderRepository.findAllByAccountIdOrderByOrderDate(accountId);
   }
 }
