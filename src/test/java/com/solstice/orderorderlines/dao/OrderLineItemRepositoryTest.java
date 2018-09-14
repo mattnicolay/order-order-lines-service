@@ -9,6 +9,7 @@ import static org.junit.Assert.*;
 import com.github.springtestdbunit.DbUnitTestExecutionListener;
 import com.github.springtestdbunit.annotation.DatabaseSetup;
 import com.solstice.orderorderlines.model.OrderLineItem;
+import java.util.List;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,5 +52,22 @@ public class OrderLineItemRepositoryTest {
   public void findOrderLineItemByIdAndOrderId_InvalidOrderId_ReturnsNull() {
     assertThat(orderLineItemRepository.findOrderLineItemByIdAndOrderId(1, 5),
         is(nullValue()));
+  }
+
+  @Test
+  public void findAllByShipmentId_ValidId_ReturnsListOfOrderLineItems() {
+    List<OrderLineItem> orderLineItems = orderLineItemRepository.findAllByShipmentId(1);
+
+    assertThat(orderLineItems, is(notNullValue()));
+    assertThat(orderLineItems.size(), is(2));
+    orderLineItems.forEach(orderLineItem -> assertThat(orderLineItem, is(notNullValue())));
+  }
+
+  @Test
+  public void findAllByShipmentId_InvalidId_ReturnsEmptyListOfOrderLineItems() {
+    List<OrderLineItem> orderLineItems = orderLineItemRepository.findAllByShipmentId(-1);
+
+    assertThat(orderLineItems, is(notNullValue()));
+    assertTrue(orderLineItems.isEmpty());
   }
 }

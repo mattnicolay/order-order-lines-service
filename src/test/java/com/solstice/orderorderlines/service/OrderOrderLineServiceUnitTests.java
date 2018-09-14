@@ -1,5 +1,6 @@
 package com.solstice.orderorderlines.service;
 
+import static junit.framework.TestCase.fail;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.is;
@@ -14,8 +15,16 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.solstice.orderorderlines.dao.OrderLineItemRepository;
 import com.solstice.orderorderlines.dao.OrderRepository;
+import com.solstice.orderorderlines.external.AccountAddressClient;
+import com.solstice.orderorderlines.external.ProductClient;
+import com.solstice.orderorderlines.external.ShipmentClient;
+import com.solstice.orderorderlines.model.Address;
 import com.solstice.orderorderlines.model.Order;
+import com.solstice.orderorderlines.model.OrderDetail;
 import com.solstice.orderorderlines.model.OrderLineItem;
+import com.solstice.orderorderlines.model.OrderLineSummary;
+import com.solstice.orderorderlines.model.Product;
+import com.solstice.orderorderlines.model.Shipment;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -36,15 +45,25 @@ public class OrderOrderLineServiceUnitTests {
 
   @MockBean
   private OrderRepository orderRepository;
-
   @MockBean
   private OrderLineItemRepository orderLineItemRepository;
+  @MockBean
+  private AccountAddressClient accountAddressClient;
+  @MockBean
+  private ProductClient productClient;
+  @MockBean
+  private ShipmentClient shipmentClient;
 
   private OrderOrderLineService orderOrderLineService;
 
   @Before
   public void setup() {
-    orderOrderLineService = new OrderOrderLineService(orderRepository, orderLineItemRepository);
+    orderOrderLineService = new OrderOrderLineService(
+        orderLineItemRepository,
+        orderRepository,
+        accountAddressClient,
+        productClient,
+        shipmentClient);
   }
 
   @Test
@@ -230,6 +249,191 @@ public class OrderOrderLineServiceUnitTests {
     assertTrue(orders.isEmpty());
   }
 
+  @Test
+  public void getOrderDetails_ValidId_ReturnsListOfOrderDetail() {
+    Order order1 = getOrder1();
+    order1.setOrderNumber(1L);
+    Order order2 = getOrder2();
+    order2.setOrderNumber(2L);
+
+    Address address = new Address(
+        "111 N Canal St",
+        "700",
+        "Chicago",
+        "IL",
+        "60606",
+        "United States"
+    );
+
+    Product product = new Product("test");
+
+    Shipment testShipment = new Shipment(
+        1,
+        1,
+        1,
+        getOrderLineSummaries(getOrderLineItems()),
+        LocalDateTime.of(2018, 9, 8, 12, 30),
+        LocalDateTime.of(2018, 9, 12, 8, 40));
+
+    when(productClient.getProductById(anyLong())).thenReturn(product);
+    when(orderRepository.findAllByAccountIdOrderByOrderDate(1)).thenReturn(Arrays.asList(
+        order1,
+        order2
+    ));
+    when(orderLineItemRepository.findAllByShipmentId(anyLong())).thenReturn(Arrays.asList(
+        getOrderLineItem1(),
+        getOrderLineItem2()
+    ));
+    when(accountAddressClient.getAddressByAccountIdAndAddressId(anyLong(), anyLong()))
+        .thenReturn(address);
+    when(shipmentClient.getShipmentById(anyLong())).thenReturn(testShipment);
+
+    List<OrderDetail> orderDetails = orderOrderLineService.getOrderDetails(1);
+
+    assertThat(orderDetails, is(notNullValue()));
+    assertThat(orderDetails.size(), is(2));
+    orderDetails.forEach(orderDetail -> {
+      assertThat(orderDetail, is(notNullValue()));
+    });
+
+    OrderDetail orderDetail = orderDetails.get(0);
+    assertThat(orderDetail.getOrderNumber(), is(1L));
+    assertThat(orderDetail.getShippingAddress(), is(equalTo(address)));
+    assertThat(orderDetail.getTotalPrice(), is(getOrder1().getTotalPrice()));
+
+    orderDetail.getOrderLineSummaries().forEach(orderLineSummary -> {
+      assertThat(orderLineSummary, is(notNullValue()));
+      assertThat(orderLineSummary.getProductName(), is(equalTo(product.getName())));
+      assertThat(orderLineSummary.getQuantity(), is(3));
+    });
+
+    orderDetail.getShipments().forEach(shipment -> {
+      assertThat(shipment, is(notNullValue()));
+      assertThat(shipment.getOrderLineItems(), is(
+          equalTo(testShipment.getOrderLineItems())));
+      assertThat(shipment.getShippedDate(), is(equalTo(testShipment.getShippedDate())));
+      assertThat(shipment.getDeliveryDate(), is(equalTo(testShipment.getDeliveryDate())));
+    });
+  }
+
+
+  @Test
+  public void getOrderDetails_InvalidId_ReturnsEmptyListOfOrderDetails() {
+    List<OrderDetail> orderDetails = orderOrderLineService.getOrderDetails(1);
+
+    assertThat(orderDetails, is(notNullValue()));
+    assertTrue(orderDetails.isEmpty());
+  }
+
+  @Test
+  public void getOrderDetails_InvalidAddressId_AddressIsNull() {
+
+    Order order1 = getOrder1();
+    order1.setOrderNumber(1L);
+    Order order2 = getOrder2();
+    order2.setOrderNumber(2L);
+
+    Product product = new Product("test");
+
+    Shipment testShipment = new Shipment(
+        1,
+        1,
+        1,
+        getOrderLineSummaries(getOrderLineItems()),
+        LocalDateTime.of(2018, 9, 8, 12, 30),
+        LocalDateTime.of(2018, 9, 12, 8, 40));
+
+    when(productClient.getProductById(anyLong())).thenReturn(product);
+    when(orderRepository.findAllByAccountIdOrderByOrderDate(1)).thenReturn(Arrays.asList(
+        order1,
+        order2
+    ));
+    when(orderLineItemRepository.findAllByShipmentId(anyLong())).thenReturn(Arrays.asList(
+        getOrderLineItem1(),
+        getOrderLineItem2()
+    ));
+    when(shipmentClient.getShipmentById(anyLong())).thenReturn(testShipment);
+
+    List<OrderDetail> orderDetails = orderOrderLineService.getOrderDetails(1);
+    assertThat(orderDetails.get(0).getShippingAddress(), is(nullValue()));
+  }
+
+  @Test
+  public void getOrderDetails_InvalidShipmentId_ShipmentsAreNull() {
+
+    Order order1 = getOrder1();
+    order1.setOrderNumber(1L);
+    Order order2 = getOrder2();
+    order2.setOrderNumber(2L);
+
+    Address address = new Address(
+        "111 N Canal St",
+        "700",
+        "Chicago",
+        "IL",
+        "60606",
+        "United States"
+    );
+
+    Product product = new Product("test");
+    when(productClient.getProductById(anyLong())).thenReturn(product);
+
+    when(orderRepository.findAllByAccountIdOrderByOrderDate(1)).thenReturn(Arrays.asList(
+        order1,
+        order2
+    ));
+    when(orderLineItemRepository.findAllByShipmentId(anyLong())).thenReturn(Arrays.asList(
+        getOrderLineItem1(),
+        getOrderLineItem2()
+    ));
+    when(accountAddressClient.getAddressByAccountIdAndAddressId(anyLong(), anyLong()))
+        .thenReturn(address);
+
+    List<OrderDetail> orderDetails = orderOrderLineService.getOrderDetails(1);
+    orderDetails.get(0).getShipments().forEach(shipment -> assertThat(shipment, is(nullValue())));
+  }
+
+  @Test
+  public void getOrderDetails_InvalidProductId_ProductNamesAreEmpty() {
+
+    Order order1 = getOrder1();
+    order1.setOrderNumber(1L);
+    Order order2 = getOrder2();
+    order2.setOrderNumber(2L);
+
+    Address address = new Address(
+        "111 N Canal St",
+        "700",
+        "Chicago",
+        "IL",
+        "60606",
+        "United States"
+    );
+
+    Shipment testShipment = new Shipment(
+        1,
+        1,
+        1,
+        getOrderLineSummaries(getOrderLineItems()),
+        LocalDateTime.of(2018, 9, 8, 12, 30),
+        LocalDateTime.of(2018, 9, 12, 8, 40));
+
+    when(orderRepository.findAllByAccountIdOrderByOrderDate(1)).thenReturn(Arrays.asList(
+        order1,
+        order2
+    ));
+    when(orderLineItemRepository.findAllByShipmentId(anyLong())).thenReturn(Arrays.asList(
+        getOrderLineItem1(),
+        getOrderLineItem2()
+    ));
+    when(accountAddressClient.getAddressByAccountIdAndAddressId(anyLong(), anyLong()))
+        .thenReturn(address);
+    when(shipmentClient.getShipmentById(anyLong())).thenReturn(testShipment);
+
+    List<OrderDetail> orderDetails = orderOrderLineService.getOrderDetails(1);
+    orderDetails.get(0).getOrderLineSummaries().forEach(orderLineSummary ->
+        assertThat(orderLineSummary.getProductName(), is(equalTo(""))));
+  }
 
   private String toJson(Object value) {
     String result = null;
@@ -319,10 +523,22 @@ public class OrderOrderLineServiceUnitTests {
   }
 
   private OrderLineItem getOrderLineItem2() {
-    return new OrderLineItem(2,5, 15.00, 2);
+    return new OrderLineItem(2,3, 15.00, 1);
   }
 
   private OrderLineItem getOrderLineItem3() {
-    return new OrderLineItem(3,8, 40.00, 3);
+    return new OrderLineItem(3,8, 40.00, 2);
+  }
+
+  private List<OrderLineSummary> getOrderLineSummaries(List<OrderLineItem> orderLineItems) {
+    List<OrderLineSummary> orderLineSummaries = new ArrayList<>();
+
+    orderLineItems.forEach(orderLineItem ->
+        orderLineSummaries.add(new OrderLineSummary(
+            "test",
+            orderLineItem.getQuantity()
+        )));
+
+    return orderLineSummaries;
   }
 }

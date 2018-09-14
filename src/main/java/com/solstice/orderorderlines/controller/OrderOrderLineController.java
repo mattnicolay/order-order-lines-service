@@ -1,6 +1,7 @@
 package com.solstice.orderorderlines.controller;
 
 import com.solstice.orderorderlines.model.Order;
+import com.solstice.orderorderlines.model.OrderDetail;
 import com.solstice.orderorderlines.model.OrderLineItem;
 import com.solstice.orderorderlines.service.OrderOrderLineService;
 import java.io.IOException;
@@ -51,8 +52,14 @@ public class OrderOrderLineController {
     );
   }
 
-  public ResponseEntity<Order> getOrderDetails(@PathVariable("id") long id) {
-    return null;
+  @GetMapping("/{accountId}")
+  public ResponseEntity<List<OrderDetail>> getOrderDetails(@PathVariable("accountId") long accountId) {
+    List<OrderDetail> orderDetails = orderOrderLineService.getOrderDetails(accountId);
+    return new ResponseEntity<>(
+        orderDetails,
+        new HttpHeaders(),
+        orderDetails.isEmpty() ? HttpStatus.NOT_FOUND : HttpStatus.OK
+    );
   }
 
   @PutMapping("/{id}")

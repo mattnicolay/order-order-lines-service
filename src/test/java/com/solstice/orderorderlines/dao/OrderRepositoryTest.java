@@ -49,18 +49,26 @@ public class OrderRepositoryTest {
 
   @Test
   public void findOrderLineItemsById_InvalidId_ReturnsEmptyOrderLineItemsList() {
-    List<OrderLineItem> orderLineItems = orderRepository.findOrderLineItemsByOrderNumber(4);
+    List<OrderLineItem> orderLineItems = orderRepository.findOrderLineItemsByOrderNumber(-1);
 
     assertThat(orderLineItems, is(notNullValue()));
     assertTrue(orderLineItems.isEmpty());
   }
 
   @Test
-  public void findAllByAccountId_ValidId_ReturnsListOfOrders() {
+  public void findAllByAccountIdOrderByOrderDate_ValidId_ReturnsListOfOrdersOrderedByOrderDate() {
     List<Order> orders = orderRepository.findAllByAccountIdOrderByOrderDate(1);
 
     assertThat(orders, is(notNullValue()));
     assertThat(orders.size(), is(2));
     assertThat(orders.get(0).getOrderNumber(), is(2L));
+  }
+
+  @Test
+  public void findAllByAccountIdOrderByOrderDate_InvalidId_ReturnsEmptyListOfOrders() {
+    List<Order> orders = orderRepository.findAllByAccountIdOrderByOrderDate(-1);
+
+    assertThat(orders, is(notNullValue()));
+    assertTrue(orders.isEmpty());
   }
 }
