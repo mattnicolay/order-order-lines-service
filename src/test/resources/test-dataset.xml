@@ -5,6 +5,7 @@
   <orders order_number="3" account_id="2" order_date="2018-09-10 05:00:00" shipping_address_id="3"/>
 
   <order_line_item id="1" price="2.50" product_id="1" quantity="2" shipment_id="1" order_id="1"/>
-  <order_line_item id="2" price="5.40" product_id="2" quantity="4" shipment_id="1" order_id="2"/>
-  <order_line_item id="3" price="2.50" product_id="1" quantity="1" shipment_id="2" order_id="3"/>
+  <order_line_item id="2" price="5.40" product_id="2" quantity="4" shipment_id="2" order_id="2"/>
+  <order_line_item id="3" price="2.50" product_id="1" quantity="1" shipment_id="3" order_id="3"/>
+  <order_line_item id="4" price="5.40" product_id="2" quantity="2" shipment_id="1" order_id="1"/>
 </dataset>

@@ -435,6 +435,22 @@ public class OrderOrderLineServiceUnitTests {
         assertThat(orderLineSummary.getProductName(), is(equalTo(""))));
   }
 
+  @Test
+   public void testProductFromJson() {
+    ObjectMapper objectMapper = new ObjectMapper();
+    try {
+      Product product = objectMapper.readValue(
+          "{\"id\":0,"
+              + "\"name\":\"Test\","
+          + "\"description\":\"Test\","
+          + "\"image\":\"TestImage\","
+          + "\"price\":1.5}", Product.class);
+    } catch (IOException e) {
+      logger.error(e.toString());
+      fail();
+    }
+  }
+
   private String toJson(Object value) {
     String result = null;
     ObjectMapper objectMapper = new ObjectMapper();

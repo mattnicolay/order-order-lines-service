@@ -44,13 +44,13 @@ public class OrderLineItemRepositoryTest {
 
   @Test
   public void findOrderLineItemByIdAndOrderId_InvalidId_ReturnsNull() {
-    assertThat(orderLineItemRepository.findOrderLineItemByIdAndOrderId(4, 1),
+    assertThat(orderLineItemRepository.findOrderLineItemByIdAndOrderId(-1, 1),
         is(nullValue()));
   }
 
   @Test
   public void findOrderLineItemByIdAndOrderId_InvalidOrderId_ReturnsNull() {
-    assertThat(orderLineItemRepository.findOrderLineItemByIdAndOrderId(1, 5),
+    assertThat(orderLineItemRepository.findOrderLineItemByIdAndOrderId(1, -1),
         is(nullValue()));
   }
 

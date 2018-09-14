@@ -3,6 +3,7 @@ package com.solstice.orderorderlines.controller;
 import com.solstice.orderorderlines.model.Order;
 import com.solstice.orderorderlines.model.OrderDetail;
 import com.solstice.orderorderlines.model.OrderLineItem;
+import com.solstice.orderorderlines.model.OrderLineSummary;
 import com.solstice.orderorderlines.service.OrderOrderLineService;
 import java.io.IOException;
 import java.util.List;
@@ -29,7 +30,7 @@ public class OrderOrderLineController {
     this.orderOrderLineService = orderOrderLineService;
   }
 
-  @GetMapping()
+  @GetMapping
   public ResponseEntity<List<Order>> getOrders(
       @RequestParam(value = "accountId", required = false) Long accountId) {
     List<Order> orders;
@@ -94,7 +95,9 @@ public class OrderOrderLineController {
   }
 
   @PostMapping("/{id}/lines")
-  public ResponseEntity<OrderLineItem> createOrderLineItem(@PathVariable("id") long id, @RequestBody String body)
+  public ResponseEntity<OrderLineItem> createOrderLineItem(
+      @PathVariable("id") long id,
+      @RequestBody String body)
       throws IOException {
     OrderLineItem orderLineItem = orderOrderLineService.createOrderLineItem(id, body);
     return new ResponseEntity<>(
