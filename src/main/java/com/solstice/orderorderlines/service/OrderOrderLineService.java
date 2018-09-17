@@ -1,6 +1,7 @@
 package com.solstice.orderorderlines.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.netflix.hystrix.contrib.javanica.annotation.HystrixCommand;
 import com.solstice.orderorderlines.dao.OrderLineItemRepository;
 import com.solstice.orderorderlines.dao.OrderRepository;
 import com.solstice.orderorderlines.external.AccountAddressClient;

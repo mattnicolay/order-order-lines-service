@@ -1,0 +1,14 @@
+applications:
+- name: order-order-line-service
+  memory: 512M
+  path: build/libs/order-order-lines-service-0.0.1-SNAPSHOT.jar
+  buildpack:
+    java_buildpack
+  env:
+    spring.profiles.active: cloud
+    JAVA_OPTS: '-Xss256K  -Xmx256m -Dserver.tomcat.max-threads=3 -Dspring.datasource.hikari.maximum-pool-size=2'
+  services:
+  - mysql
+  - config-server
+  - service-registry
+  - circuit-breaker
