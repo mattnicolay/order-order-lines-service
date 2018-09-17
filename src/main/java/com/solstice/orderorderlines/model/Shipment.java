@@ -1,6 +1,8 @@
 package com.solstice.orderorderlines.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonProperty.Access;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
@@ -8,10 +10,12 @@ import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import java.time.LocalDateTime;
 import java.util.List;
 
-@JsonIgnoreProperties({"id", "accountId", "shippingAddressId"})
 public class Shipment {
+  @JsonProperty(access = Access.WRITE_ONLY)
   private long id;
+  @JsonProperty(access = Access.WRITE_ONLY)
   private long accountId;
+  @JsonProperty(access = Access.WRITE_ONLY)
   private long shippingAddressId;
   private List<OrderLineSummary> orderLineItems;
 
@@ -97,5 +101,17 @@ public class Shipment {
 
   public void addOrderLineItem(OrderLineSummary orderLineSummary) {
     orderLineItems.add(orderLineSummary);
+  }
+
+  @Override
+  public String toString() {
+    return "Shipment{" +
+        "id=" + id +
+        ", accountId=" + accountId +
+        ", shippingAddressId=" + shippingAddressId +
+        ", orderLineItems=" + orderLineItems +
+        ", shippedDate=" + shippedDate +
+        ", deliveryDate=" + deliveryDate +
+        '}';
   }
 }

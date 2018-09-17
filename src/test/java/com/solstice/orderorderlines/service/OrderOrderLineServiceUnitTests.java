@@ -301,7 +301,7 @@ public class OrderOrderLineServiceUnitTests {
     assertThat(orderDetail.getShippingAddress(), is(equalTo(address)));
     assertThat(orderDetail.getTotalPrice(), is(getOrder1().getTotalPrice()));
 
-    orderDetail.getOrderLineSummaries().forEach(orderLineSummary -> {
+    orderDetail.getOrderLineItems().forEach(orderLineSummary -> {
       assertThat(orderLineSummary, is(notNullValue()));
       assertThat(orderLineSummary.getProductName(), is(equalTo(product.getName())));
       assertThat(orderLineSummary.getQuantity(), is(3));
@@ -431,7 +431,7 @@ public class OrderOrderLineServiceUnitTests {
     when(shipmentClient.getShipmentById(anyLong())).thenReturn(testShipment);
 
     List<OrderDetail> orderDetails = orderOrderLineService.getOrderDetails(1);
-    orderDetails.get(0).getOrderLineSummaries().forEach(orderLineSummary ->
+    orderDetails.get(0).getOrderLineItems().forEach(orderLineSummary ->
         assertThat(orderLineSummary.getProductName(), is(equalTo(""))));
   }
 

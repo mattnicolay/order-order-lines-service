@@ -16,10 +16,15 @@ import com.solstice.orderorderlines.model.Shipment;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 @Service
 public class OrderOrderLineService {
+
+  private Logger logger = LoggerFactory.getLogger(OrderOrderLineService.class);
 
   private OrderLineItemRepository orderLineItemRepository;
   private OrderRepository orderRepository;
@@ -119,15 +124,20 @@ public class OrderOrderLineService {
 
       Address address = accountAddressClient.getAddressByAccountIdAndAddressId(
           order.getAccountId(), order.getShippingAddressId());
-
+      logger.info("Address from feign client: {}", address);
       List<OrderLineItem> orderLineItems = orderRepository
           .findOrderLineItemsByOrderNumber(order.getOrderNumber());
 
       List<Shipment> shipments = new ArrayList<>();
       orderLineItems.forEach(orderLineItem -> {
           Shipment shipment = shipmentClient.getShipmentById(orderLineItem.getShipmentId());
-          shipment.setOrderLineItems(getOrderLineSummaries(orderLineItemRepository
-              .findAllByShipmentId(shipment.getId())));
+          logger.info("Shipment from feign client: {}", shipment);
+          shipment.setOrderLineItems(getOrderLineSummaries(
+              orderLineItems
+                  .stream()
+                  .filter(o -> o.getShipmentId() == shipment.getId())
+                  .collect(Collectors.toList()))
+          );
           shipments.add(shipment);
       });
 

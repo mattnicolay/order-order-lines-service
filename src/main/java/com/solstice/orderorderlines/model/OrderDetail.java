@@ -6,7 +6,7 @@ public class OrderDetail {
   private long orderNumber;
   private Address shippingAddress;
   private double totalPrice;
-  private List<OrderLineSummary> orderLineSummaries;
+  private List<OrderLineSummary> orderLineItems;
   private List<Shipment> shipments;
 
   public OrderDetail() {
@@ -14,11 +14,11 @@ public class OrderDetail {
   }
 
   public OrderDetail(long orderNumber, Address shippingAddress, double totalPrice,
-      List<OrderLineSummary> orderLineSummaries, List<Shipment> shipments) {
+      List<OrderLineSummary> orderLineItems, List<Shipment> shipments) {
     this.orderNumber = orderNumber;
     this.shippingAddress = shippingAddress;
     this.totalPrice = totalPrice;
-    this.orderLineSummaries = orderLineSummaries;
+    this.orderLineItems = orderLineItems;
     this.shipments = shipments;
   }
 
@@ -46,12 +46,12 @@ public class OrderDetail {
     this.totalPrice = totalPrice;
   }
 
-  public List<OrderLineSummary> getOrderLineSummaries() {
-    return orderLineSummaries;
+  public List<OrderLineSummary> getOrderLineItems() {
+    return orderLineItems;
   }
 
-  public void setOrderLineSummaries(List<OrderLineSummary> orderLineSummaries) {
-    this.orderLineSummaries = orderLineSummaries;
+  public void setOrderLineItems(List<OrderLineSummary> orderLineItems) {
+    this.orderLineItems = orderLineItems;
   }
 
   public List<Shipment> getShipments() {
