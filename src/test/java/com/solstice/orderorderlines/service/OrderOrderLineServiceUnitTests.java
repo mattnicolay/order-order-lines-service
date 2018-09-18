@@ -326,7 +326,7 @@ public class OrderOrderLineServiceUnitTests {
   }
 
   @Test
-  public void getOrderDetails_InvalidAddressId_AddressIsNull() {
+  public void getOrderDetails_AddressServiceIsDown_AddressIsEmpty() {
 
     Order order1 = getOrder1();
     order1.setOrderNumber(1L);
@@ -352,14 +352,17 @@ public class OrderOrderLineServiceUnitTests {
         getOrderLineItem1(),
         getOrderLineItem2()
     ));
+    when(accountAddressClient.getAddressByAccountIdAndAddressId(anyLong(), anyLong()))
+        .thenReturn(new Address("","","","","",""));
     when(shipmentClient.getShipmentById(anyLong())).thenReturn(testShipment);
 
     List<OrderDetail> orderDetails = orderOrderLineService.getOrderDetails(1);
-    assertThat(orderDetails.get(0).getShippingAddress(), is(nullValue()));
+    assertThat(orderDetails.get(0).getShippingAddress(), is(notNullValue()));
+    assertThat(orderDetails.get(0).getShippingAddress().getStreet(), is(equalTo("")));
   }
 
   @Test
-  public void getOrderDetails_InvalidShipmentId_ShipmentsAreNull() {
+  public void getOrderDetails_ShipmentServiceIsDown_ShipmentsAreEmpty() {
 
     Order order1 = getOrder1();
     order1.setOrderNumber(1L);
@@ -388,13 +391,16 @@ public class OrderOrderLineServiceUnitTests {
     ));
     when(accountAddressClient.getAddressByAccountIdAndAddressId(anyLong(), anyLong()))
         .thenReturn(address);
+    when(shipmentClient.getShipmentById(anyLong())).thenReturn(new Shipment());
 
     List<OrderDetail> orderDetails = orderOrderLineService.getOrderDetails(1);
-    orderDetails.get(0).getShipments().forEach(shipment -> assertThat(shipment, is(nullValue())));
+    assertThat(orderDetails, is(notNullValue()));
+    assertFalse(orderDetails.isEmpty());
+    orderDetails.get(0).getShipments().forEach(shipment -> assertThat(shipment, is(notNullValue())));
   }
 
   @Test
-  public void getOrderDetails_InvalidProductId_ProductNamesAreEmpty() {
+  public void getOrderDetails_ProductServiceIsDown_ProductNamesAreEmpty() {
 
     Order order1 = getOrder1();
     order1.setOrderNumber(1L);
@@ -431,8 +437,12 @@ public class OrderOrderLineServiceUnitTests {
     when(shipmentClient.getShipmentById(anyLong())).thenReturn(testShipment);
 
     List<OrderDetail> orderDetails = orderOrderLineService.getOrderDetails(1);
-    orderDetails.get(0).getOrderLineItems().forEach(orderLineSummary ->
-        assertThat(orderLineSummary.getProductName(), is(equalTo(""))));
+    assertThat(orderDetails, is(notNullValue()));
+    assertFalse(orderDetails.isEmpty());
+    orderDetails.get(0).getOrderLineItems().forEach(orderLineSummary -> {
+      assertThat(orderLineSummary.getProductName(), is(notNullValue()));
+      assertThat(orderLineSummary.getProductName(), is(equalTo("")));
+    });
   }
 
   @Test

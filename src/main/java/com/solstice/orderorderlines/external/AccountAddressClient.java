@@ -19,6 +19,6 @@ class AccountAddressFallback implements AccountAddressClient {
 
   @Override
   public Address getAddressByAccountIdAndAddressId(long accountId, long addressId) {
-    return null;
+    return new Address("","","","","","");
   }
 }
