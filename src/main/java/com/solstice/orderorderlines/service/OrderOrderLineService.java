@@ -18,6 +18,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
+import javax.persistence.EntityNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -129,6 +130,9 @@ public class OrderOrderLineService {
 
       Address address = accountAddressClient.getAddressByAccountIdAndAddressId(
           order.getAccountId(), order.getShippingAddressId());
+      if (address == null) {
+        throw new EntityNotFoundException("Could not fetch address");
+      }
       logger.info("Address from feign client: {}", address);
       List<OrderLineItem> orderLineItems = orderRepository
           .findOrderLineItemsByOrderNumber(order.getOrderNumber());
@@ -136,6 +140,9 @@ public class OrderOrderLineService {
       List<Shipment> shipments = new ArrayList<>();
       orderLineItems.forEach(orderLineItem -> {
           Shipment shipment = shipmentClient.getShipmentById(orderLineItem.getShipmentId());
+          if (shipment == null) {
+            throw new EntityNotFoundException("Could not fetch shipments");
+          }
           logger.info("Shipment from feign client: {}", shipment);
           shipment.setOrderLineItems(getOrderLineSummaries(
               orderLineItems
@@ -163,9 +170,10 @@ public class OrderOrderLineService {
 
     orderLineItems.forEach(orderLineItem -> {
       Product product = productClient.getProductById(orderLineItem.getProductId());
-      orderLineSummaries.add(new OrderLineSummary(
-          product == null ? "" : product.getName(),
-          orderLineItem.getQuantity()
+      if (product == null) {
+        throw new EntityNotFoundException("Could not fetch products");
+      }
+      orderLineSummaries.add(new OrderLineSummary(product.getName(), orderLineItem.getQuantity()
       ));
     });
 

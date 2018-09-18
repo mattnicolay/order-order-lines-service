@@ -30,6 +30,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import javax.persistence.EntityNotFoundException;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -280,7 +281,7 @@ public class OrderOrderLineServiceUnitTests {
         order1,
         order2
     ));
-    when(orderLineItemRepository.findAllByShipmentId(anyLong())).thenReturn(Arrays.asList(
+    when(orderRepository.findOrderLineItemsByOrderNumber(anyLong())).thenReturn(Arrays.asList(
         getOrderLineItem1(),
         getOrderLineItem2()
     ));
@@ -325,41 +326,24 @@ public class OrderOrderLineServiceUnitTests {
     assertTrue(orderDetails.isEmpty());
   }
 
-  @Test
-  public void getOrderDetails_InvalidAddressId_AddressIsNull() {
+  @Test(expected = EntityNotFoundException.class)
+  public void getOrderDetails_AccountAddressServiceIsDown_ThrowsEntityNotFoundException() {
 
     Order order1 = getOrder1();
     order1.setOrderNumber(1L);
     Order order2 = getOrder2();
     order2.setOrderNumber(2L);
 
-    Product product = new Product("test");
-
-    Shipment testShipment = new Shipment(
-        1,
-        1,
-        1,
-        getOrderLineSummaries(getOrderLineItems()),
-        LocalDateTime.of(2018, 9, 8, 12, 30),
-        LocalDateTime.of(2018, 9, 12, 8, 40));
-
-    when(productClient.getProductById(anyLong())).thenReturn(product);
     when(orderRepository.findAllByAccountIdOrderByOrderDate(1)).thenReturn(Arrays.asList(
         order1,
         order2
     ));
-    when(orderLineItemRepository.findAllByShipmentId(anyLong())).thenReturn(Arrays.asList(
-        getOrderLineItem1(),
-        getOrderLineItem2()
-    ));
-    when(shipmentClient.getShipmentById(anyLong())).thenReturn(testShipment);
 
-    List<OrderDetail> orderDetails = orderOrderLineService.getOrderDetails(1);
-    assertThat(orderDetails.get(0).getShippingAddress(), is(nullValue()));
+    orderOrderLineService.getOrderDetails(1);
   }
 
-  @Test
-  public void getOrderDetails_InvalidShipmentId_ShipmentsAreNull() {
+  @Test(expected = EntityNotFoundException.class)
+  public void getOrderDetails_ShipmentServiceIsDown_ThrowsEntityNotFoundException() {
 
     Order order1 = getOrder1();
     order1.setOrderNumber(1L);
@@ -376,25 +360,23 @@ public class OrderOrderLineServiceUnitTests {
     );
 
     Product product = new Product("test");
-    when(productClient.getProductById(anyLong())).thenReturn(product);
 
     when(orderRepository.findAllByAccountIdOrderByOrderDate(1)).thenReturn(Arrays.asList(
         order1,
         order2
     ));
-    when(orderLineItemRepository.findAllByShipmentId(anyLong())).thenReturn(Arrays.asList(
+    when(orderRepository.findOrderLineItemsByOrderNumber(anyLong())).thenReturn(Arrays.asList(
         getOrderLineItem1(),
         getOrderLineItem2()
     ));
     when(accountAddressClient.getAddressByAccountIdAndAddressId(anyLong(), anyLong()))
         .thenReturn(address);
 
-    List<OrderDetail> orderDetails = orderOrderLineService.getOrderDetails(1);
-    orderDetails.get(0).getShipments().forEach(shipment -> assertThat(shipment, is(nullValue())));
+    orderOrderLineService.getOrderDetails(1);
   }
 
-  @Test
-  public void getOrderDetails_InvalidProductId_ProductNamesAreEmpty() {
+  @Test(expected = EntityNotFoundException.class)
+  public void getOrderDetails_ProductServiceIsDown_ThrowsEntityNotFoundException() {
 
     Order order1 = getOrder1();
     order1.setOrderNumber(1L);
@@ -422,7 +404,7 @@ public class OrderOrderLineServiceUnitTests {
         order1,
         order2
     ));
-    when(orderLineItemRepository.findAllByShipmentId(anyLong())).thenReturn(Arrays.asList(
+    when(orderRepository.findOrderLineItemsByOrderNumber(anyLong())).thenReturn(Arrays.asList(
         getOrderLineItem1(),
         getOrderLineItem2()
     ));
@@ -430,16 +412,15 @@ public class OrderOrderLineServiceUnitTests {
         .thenReturn(address);
     when(shipmentClient.getShipmentById(anyLong())).thenReturn(testShipment);
 
-    List<OrderDetail> orderDetails = orderOrderLineService.getOrderDetails(1);
-    orderDetails.get(0).getOrderLineItems().forEach(orderLineSummary ->
-        assertThat(orderLineSummary.getProductName(), is(equalTo(""))));
+    orderOrderLineService.getOrderDetails(1);
   }
 
   @Test
    public void testProductFromJson() {
     ObjectMapper objectMapper = new ObjectMapper();
+    Product product = null;
     try {
-      Product product = objectMapper.readValue(
+      product = objectMapper.readValue(
           "{\"id\":0,"
               + "\"name\":\"Test\","
           + "\"description\":\"Test\","
@@ -449,6 +430,8 @@ public class OrderOrderLineServiceUnitTests {
       logger.error(e.toString());
       fail();
     }
+    assertThat(product, is(notNullValue()));
+    assertThat(product.getName(), is(equalTo("Test")));
   }
 
   private String toJson(Object value) {
