@@ -17,6 +17,6 @@ class ProductClientFallback implements  ProductClient{
 
   @Override
   public Product getProductById(long id) {
-    return null;
+    return new Product("");
   }
 }

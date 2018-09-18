@@ -16,6 +16,6 @@ public interface ShipmentClient {
 class ShipmentClientFallback implements ShipmentClient{
   @Override
   public Shipment getShipmentById(long id) {
-    return null;
+    return new Shipment();
   }
 }
