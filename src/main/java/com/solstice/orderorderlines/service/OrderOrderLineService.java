@@ -112,9 +112,7 @@ public class OrderOrderLineService {
   public OrderLineItem deleteOrderLineItem(long orderId, long orderLineId) {
     OrderLineItem deletedOrderLineItem = orderLineItemRepository
         .findOrderLineItemByIdAndOrderId(orderLineId, orderId);
-    if (deletedOrderLineItem != null) {
-      orderLineItemRepository.delete(deletedOrderLineItem);
-    }
+    orderLineItemRepository.delete(deletedOrderLineItem);
     return deletedOrderLineItem;
   }
 

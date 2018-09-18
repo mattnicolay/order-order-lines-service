@@ -32,7 +32,7 @@ public class Order {
   @JsonSerialize(using = LocalDateTimeSerializer.class)
   private LocalDateTime orderDate;
   private long shippingAddressId;
-  @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+  @OneToMany(cascade = CascadeType.ALL)
   @JoinColumn(name = "orderId")
   @JsonIgnoreProperties("orderId")
   private List<OrderLineItem> orderLineItems;
