@@ -1,5 +1,6 @@
 package com.solstice.orderorderlines.controller;
 
+import static org.junit.Assert.fail;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
@@ -27,7 +28,6 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import javax.persistence.EntityNotFoundException;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -97,14 +97,6 @@ public class OrderOrderLineControllerUnitTests {
   @Test
   public void getOrderDetails_InvalidId_Code404EmptyResponse() throws Exception {
     mockMvcPerform(GET, "/orders/-1", 404, "[]");
-  }
-
-  @Test
-  public void getOrderDetails_ExternalServiceIsDown_Code500() throws Exception {
-    when(orderOrderLineService.getOrderDetails(1))
-        .thenThrow(new EntityNotFoundException("Could not fetch address"));
-    mockMvcPerform(GET, "/orders/1", 500,
-        "<h1>ERROR:</h1>\n Could not fetch address");
   }
 
 
