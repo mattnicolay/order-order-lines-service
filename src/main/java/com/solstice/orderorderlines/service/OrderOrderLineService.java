@@ -74,7 +74,9 @@ public class OrderOrderLineService {
 
   public Order deleteOrder(long id) {
     Order deletedOrder = getOrderById(id);
-    orderRepository.delete(deletedOrder);
+    if (deletedOrder != null) {
+      orderRepository.delete(deletedOrder);
+    }
     return deletedOrder;
   }
 
