@@ -101,8 +101,19 @@ public class OrderOrderLineServiceUnitTests {
   @Test
   public void createOrder_ValidJson_ReturnsCreatedOrder() throws IOException {
     Order order1 = getOrder1();
+    when(productClient.getProductById(1)).thenReturn(getTestProduct());
+    when(productClient.getProductById(3)).thenReturn(new Product("Testing",0.50));
     Order order = orderOrderLineService.createOrder(toJson(order1));
     assertThatOrdersAreEqual(order, order1);
+  }
+
+  @Test
+  public void createOrder_ProductServiceIsDown_TotalPriceIsZero() throws IOException {
+    Order order1 = getOrder1();
+    when(productClient.getProductById(anyLong())).thenReturn(new Product("",0));
+    Order order = orderOrderLineService.createOrder(toJson(order1));
+    assertThat(order, is(notNullValue()));
+    assertThat(order.getTotalPrice(), is(0.0));
   }
 
   @Test(expected = IOException.class)
@@ -114,9 +125,22 @@ public class OrderOrderLineServiceUnitTests {
   public void updateOrder_ValidIdAndJson_ReturnsOrder() throws IOException {
     Order order1 = getOrder1();
     when(orderRepository.findByOrderNumber(1)).thenReturn(order1);
+    when(productClient.getProductById(1)).thenReturn(getTestProduct());
+    when(productClient.getProductById(3)).thenReturn(new Product("Testing",0.50));
     Order order = orderOrderLineService.updateOrder(1, toJson(order1));
-
+    logger.debug(order.toString());
+    logger.debug(order1.toString());
     assertThatOrdersAreEqual(order, order1);
+  }
+
+  @Test
+  public void updateOrder_ProductServiceIsDown_TotalPriceIsZero() throws IOException {
+    Order order1 = getOrder1();
+    when(orderRepository.findByOrderNumber(1)).thenReturn(order1);
+    when(productClient.getProductById(anyLong())).thenReturn(new Product("",0.0));
+    Order order = orderOrderLineService.updateOrder(1, toJson(order1));
+    assertThat(order, is(notNullValue()));
+    assertThat(order.getTotalPrice(), is(0.0));
   }
 
   @Test
@@ -174,9 +198,22 @@ public class OrderOrderLineServiceUnitTests {
   public void createOrderLineItem_ValidIdAndJson_ReturnsCreatedOrder() throws IOException {
     OrderLineItem orderLineItem1 = getOrderLineItem1();
     when(orderRepository.findByOrderNumber(1)).thenReturn(getOrder1());
+    when(productClient.getProductById(anyLong())).thenReturn(getTestProduct());
     OrderLineItem orderLineItem = orderOrderLineService.createOrderLineItem(1, toJson(orderLineItem1));
 
     assertThatOrderLineItemsAreEqual(orderLineItem, orderLineItem1);
+  }
+
+  @Test
+  public void createOrderLineItem_ProductServiceIsDown_TotalPriceIsZero() throws IOException {
+    OrderLineItem orderLineItem1 = getOrderLineItem1();
+    when(orderRepository.findByOrderNumber(1)).thenReturn(getOrder1());
+    when(productClient.getProductById(anyLong())).thenReturn(new Product("", 0.0));
+    OrderLineItem orderLineItem = orderOrderLineService.createOrderLineItem(1, toJson(orderLineItem1));
+
+    assertThat(orderLineItem, is(notNullValue()));
+    assertThat(orderLineItem.getPrice(), is(0.0));
+    assertThat(orderLineItem.getTotalPrice(), is(0.0));
   }
 
   @Test(expected = IOException.class)
@@ -196,10 +233,25 @@ public class OrderOrderLineServiceUnitTests {
     OrderLineItem orderLineItem1 = getOrderLineItem1();
     when(orderLineItemRepository.findOrderLineItemByIdAndOrderId(1, 1))
         .thenReturn(orderLineItem1);
+    when(productClient.getProductById(anyLong())).thenReturn(getTestProduct());
     OrderLineItem orderLineItem = orderOrderLineService
         .updateOrderLineItem(1, 1, toJson(orderLineItem1));
 
     assertThatOrderLineItemsAreEqual(orderLineItem, orderLineItem1);
+  }
+
+  @Test
+  public void updateOrderLineItem_ProductServiceIsDown_TotalPriceIsZero() throws IOException {
+    OrderLineItem orderLineItem1 = getOrderLineItem1();
+    when(orderLineItemRepository.findOrderLineItemByIdAndOrderId(1, 1))
+        .thenReturn(orderLineItem1);
+    when(productClient.getProductById(anyLong())).thenReturn(new Product("", 0.0));
+    OrderLineItem orderLineItem = orderOrderLineService
+        .updateOrderLineItem(1, 1, toJson(orderLineItem1));
+
+    assertThat(orderLineItem, is(notNullValue()));
+    assertThat(orderLineItem.getPrice(), is(0.0));
+    assertThat(orderLineItem.getTotalPrice(), is(0.0));
   }
 
   @Test
@@ -265,7 +317,7 @@ public class OrderOrderLineServiceUnitTests {
         "United States"
     );
 
-    Product product = new Product("test");
+    Product product = getTestProduct();
 
     Shipment testShipment = new Shipment(
         1,
@@ -333,7 +385,7 @@ public class OrderOrderLineServiceUnitTests {
     Order order2 = getOrder2();
     order2.setOrderNumber(2L);
 
-    Product product = new Product("test");
+    Product product = getTestProduct();
 
     Shipment testShipment = new Shipment(
         1,
@@ -378,7 +430,7 @@ public class OrderOrderLineServiceUnitTests {
         "United States"
     );
 
-    Product product = new Product("test");
+    Product product = getTestProduct();
     when(productClient.getProductById(anyLong())).thenReturn(product);
 
     when(orderRepository.findAllByAccountIdOrderByOrderDate(1)).thenReturn(Arrays.asList(
@@ -545,15 +597,19 @@ public class OrderOrderLineServiceUnitTests {
   }
 
   private OrderLineItem getOrderLineItem1() {
-    return new OrderLineItem(1,3, 25.00, 1);
+    return new OrderLineItem(1,3, 2.50,1);
   }
 
   private OrderLineItem getOrderLineItem2() {
-    return new OrderLineItem(2,3, 15.00, 1);
+    return new OrderLineItem(2,3, 5.00,1);
   }
 
   private OrderLineItem getOrderLineItem3() {
-    return new OrderLineItem(3,8, 40.00, 2);
+    return new OrderLineItem(3,8, 0.50,2);
+  }
+
+  private Product getTestProduct() {
+    return new Product("Test", 2.50);
   }
 
   private List<OrderLineSummary> getOrderLineSummaries(List<OrderLineItem> orderLineItems) {

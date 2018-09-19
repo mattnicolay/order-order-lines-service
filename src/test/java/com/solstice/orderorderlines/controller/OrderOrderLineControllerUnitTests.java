@@ -289,7 +289,7 @@ public class OrderOrderLineControllerUnitTests {
         "United States"
     );
 
-    Product product = new Product("test");
+    Product product = new Product("test", 2.50);
 
     List<Shipment> shipments = new ArrayList<>();
     Shipment testShipment = new Shipment(

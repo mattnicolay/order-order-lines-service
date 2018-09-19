@@ -48,8 +48,13 @@ public class OrderLineItem {
     this.quantity = quantity;
     this.price = price;
     this.shipmentId = shipmentId;
-    setPrice();
     setTotalPrice();
+  }
+
+  public OrderLineItem(long productId, int quantity, long shipmentId) {
+    this.productId = productId;
+    this.quantity = quantity;
+    this.shipmentId = shipmentId;
   }
 
   public long getId() {
@@ -66,7 +71,6 @@ public class OrderLineItem {
 
   public void setProductId(long productId) {
     this.productId = productId;
-    setPrice();
   }
 
   public int getQuantity() {
@@ -82,7 +86,8 @@ public class OrderLineItem {
     return price;
   }
 
-  public void setPrice() {
+  public void setPrice(double price) {
+    this.price = price;
     setTotalPrice();
   }
 
@@ -101,6 +106,18 @@ public class OrderLineItem {
 
   public void setTotalPrice() {
     totalPrice = price * quantity;
+  }
+
+  @Override
+  public String toString() {
+    return "OrderLineItem{\n" +
+        "id=" + id +
+        ",\n productId=" + productId +
+        ",\n quantity=" + quantity +
+        ",\n price=" + price +
+        ",\n totalPrice=" + totalPrice +
+        ",\n shipmentId=" + shipmentId +
+        '}';
   }
 }
 

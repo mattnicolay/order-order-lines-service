@@ -106,11 +106,23 @@ public class Order {
     return totalPrice;
   }
 
-  private void setTotalPrice() {
+  public void setTotalPrice() {
     totalPrice = 0;
     if (orderLineItems != null) {
       this.orderLineItems.forEach(o -> totalPrice += o.getTotalPrice());
     }
+  }
+
+  @Override
+  public String toString() {
+    return "Order{\n" +
+        "orderNumber=" + orderNumber +
+        ",\n accountId=" + accountId +
+        ",\n orderDate=" + orderDate +
+        ",\n shippingAddressId=" + shippingAddressId +
+        ",\n orderLineItems=" + orderLineItems +
+        ",\n totalPrice=" + totalPrice +
+        "\n}";
   }
 }
 

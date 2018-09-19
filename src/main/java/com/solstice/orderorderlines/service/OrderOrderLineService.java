@@ -58,6 +58,7 @@ public class OrderOrderLineService {
 
   public Order createOrder(String data) throws IOException {
     Order order = objectMapper.readValue(data, Order.class);
+    setPrices(order);
     orderRepository.save(order);
     return order;
   }
@@ -67,6 +68,7 @@ public class OrderOrderLineService {
     if(updatedOrder == null || orderRepository.findByOrderNumber(id) == null) {
       return null;
     }
+    setPrices(updatedOrder);
     updatedOrder.setOrderNumber(id);
     orderRepository.save(updatedOrder);
     return updatedOrder;
@@ -89,6 +91,7 @@ public class OrderOrderLineService {
     Order order = orderRepository.findByOrderNumber(id);
     if(order != null) {
       orderLineItem = objectMapper.readValue(body, OrderLineItem.class);
+      setPrice(orderLineItem);
       order.addOrderLineItem(orderLineItem);
       orderRepository.save(order);
     }
@@ -102,6 +105,7 @@ public class OrderOrderLineService {
         .findOrderLineItemByIdAndOrderId(orderLineId, orderId);
     if (dbOrderLineItem != null) {
       updateOrderLineItem = objectMapper.readValue(body, OrderLineItem.class);
+      setPrice(updateOrderLineItem);
       updateOrderLineItem.setId(orderId);
       orderLineItemRepository.save(updateOrderLineItem);
     }
@@ -156,6 +160,19 @@ public class OrderOrderLineService {
     });
 
     return orderDetails;
+  }
+
+  private void setPrices(Order order) {
+    for (OrderLineItem orderLineItem : order.getOrderLineItems()) {
+      logger.debug(orderLineItem.toString());
+      setPrice(orderLineItem);
+    }
+    order.setTotalPrice();
+  }
+
+  private void setPrice(OrderLineItem orderLineItem) {
+    Product product = productClient.getProductById(orderLineItem.getProductId());
+    orderLineItem.setPrice(product.getPrice());
   }
 
   private List<OrderLineSummary> getOrderLineSummaries(List<OrderLineItem> orderLineItems) {

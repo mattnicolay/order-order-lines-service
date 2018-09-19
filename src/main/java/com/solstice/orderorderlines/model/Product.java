@@ -1,18 +1,27 @@
 package com.solstice.orderorderlines.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonProperty.Access;
 
-@JsonIgnoreProperties({"id","description","image","price"})
+@JsonIgnoreProperties({"id","description","image"})
 public class Product {
   private String name;
+  @JsonProperty(access = Access.WRITE_ONLY)
+  private double price;
 
 
   public Product() {
 
   }
 
-  public Product(String name) {
+//  public Product(String name) {
+//    this.name = name;
+//  }
+
+  public Product(String name, double price) {
     this.name = name;
+    this.price = price;
   }
 
   public String getName() {
@@ -21,5 +30,13 @@ public class Product {
 
   public void setName(String name) {
     this.name = name;
+  }
+
+  public double getPrice() {
+    return price;
+  }
+
+  public void setPrice(double price) {
+    this.price = price;
   }
 }
