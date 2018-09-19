@@ -15,7 +15,7 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 @ControllerAdvice(annotations = RestController.class)
 public class OrderOrderLineExceptionHandler extends ResponseEntityExceptionHandler {
 
-  private Logger logger = LoggerFactory.getLogger(OrderOrderLineExceptionHandler.class);
+  private Logger logger = LoggerFactory.getLogger(this.getClass());
 
   @ExceptionHandler(value = {IOException.class})
   protected ResponseEntity<Object> handleIOException(Exception ex, WebRequest request) {

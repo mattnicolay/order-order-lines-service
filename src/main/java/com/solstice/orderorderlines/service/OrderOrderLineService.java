@@ -25,7 +25,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class OrderOrderLineService {
 
-  private Logger logger = LoggerFactory.getLogger(OrderOrderLineService.class);
+  private Logger logger = LoggerFactory.getLogger(this.getClass());
 
   private OrderLineItemRepository orderLineItemRepository;
   private OrderRepository orderRepository;
