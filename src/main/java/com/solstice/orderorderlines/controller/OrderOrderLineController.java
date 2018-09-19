@@ -44,7 +44,7 @@ public class OrderOrderLineController {
   }
 
   @PostMapping
-  public ResponseEntity<Order> createOrder(@RequestBody String body) throws IOException {
+  public ResponseEntity<Order> createOrder(@RequestBody Order body) {
     Order order = orderOrderLineService.createOrder(body);
     return new ResponseEntity<>(
         order,
@@ -64,8 +64,7 @@ public class OrderOrderLineController {
   }
 
   @PutMapping("/{id}")
-  public ResponseEntity<Order> updateOrder(@PathVariable("id") long id, @RequestBody String body)
-      throws IOException {
+  public ResponseEntity<Order> updateOrder(@PathVariable("id") long id, @RequestBody Order body) {
     Order order = orderOrderLineService.updateOrder(id, body);
     return new ResponseEntity<>(
         order,
@@ -97,8 +96,7 @@ public class OrderOrderLineController {
   @PostMapping("/{id}/lines")
   public ResponseEntity<OrderLineItem> createOrderLineItem(
       @PathVariable("id") long id,
-      @RequestBody String body)
-      throws IOException {
+      @RequestBody OrderLineItem body) {
     OrderLineItem orderLineItem = orderOrderLineService.createOrderLineItem(id, body);
     return new ResponseEntity<>(
         orderLineItem,
@@ -111,7 +109,7 @@ public class OrderOrderLineController {
   public ResponseEntity<OrderLineItem> updateOrderLineItem(
       @PathVariable("orderId") long orderId,
       @PathVariable("orderLineId") long orderLineId,
-      @RequestBody String body) throws IOException {
+      @RequestBody OrderLineItem body) {
     OrderLineItem orderLineItem = orderOrderLineService.updateOrderLineItem(orderId, orderLineId, body);
     return new ResponseEntity<>(
         orderLineItem,

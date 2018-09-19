@@ -56,22 +56,20 @@ public class OrderOrderLineService {
     return orderRepository.findByOrderNumber(id);
   }
 
-  public Order createOrder(String data) throws IOException {
-    Order order = objectMapper.readValue(data, Order.class);
+  public Order createOrder(Order order) {
     setPrices(order);
     orderRepository.save(order);
     return order;
   }
 
-  public Order updateOrder(long id, String body) throws IOException {
-    Order updatedOrder = objectMapper.readValue(body, Order.class);
-    if(updatedOrder == null || orderRepository.findByOrderNumber(id) == null) {
+  public Order updateOrder(long id, Order orderToUpdate){
+    if(orderToUpdate == null || orderRepository.findByOrderNumber(id) == null) {
       return null;
     }
-    setPrices(updatedOrder);
-    updatedOrder.setOrderNumber(id);
-    orderRepository.save(updatedOrder);
-    return updatedOrder;
+    setPrices(orderToUpdate);
+    orderToUpdate.setOrderNumber(id);
+    orderRepository.save(orderToUpdate);
+    return orderToUpdate;
   }
 
   public Order deleteOrder(long id) {
@@ -86,30 +84,29 @@ public class OrderOrderLineService {
     return orderRepository.findOrderLineItemsByOrderNumber(id);
   }
 
-  public OrderLineItem createOrderLineItem(long id, String body) throws IOException {
-    OrderLineItem orderLineItem = null;
+  public OrderLineItem createOrderLineItem(long id, OrderLineItem orderLineItem) {
     Order order = orderRepository.findByOrderNumber(id);
-    if(order != null) {
-      orderLineItem = objectMapper.readValue(body, OrderLineItem.class);
-      setPrice(orderLineItem);
-      order.addOrderLineItem(orderLineItem);
-      orderRepository.save(order);
+    if (orderLineItem == null || order == null) {
+      return null;
     }
+    setPrice(orderLineItem);
+    order.addOrderLineItem(orderLineItem);
+    orderRepository.save(order);
+
     return orderLineItem;
   }
 
-  public OrderLineItem updateOrderLineItem(long orderId, long orderLineId, String body)
-      throws IOException {
-    OrderLineItem updateOrderLineItem = null;
+  public OrderLineItem updateOrderLineItem(long orderId, long orderLineId, OrderLineItem orderLineItem) {
     OrderLineItem dbOrderLineItem = orderLineItemRepository
         .findOrderLineItemByIdAndOrderId(orderLineId, orderId);
-    if (dbOrderLineItem != null) {
-      updateOrderLineItem = objectMapper.readValue(body, OrderLineItem.class);
-      setPrice(updateOrderLineItem);
-      updateOrderLineItem.setId(orderId);
-      orderLineItemRepository.save(updateOrderLineItem);
+    if (orderLineItem == null || dbOrderLineItem == null) {
+      return null;
     }
-    return updateOrderLineItem;
+    setPrice(orderLineItem);
+    orderLineItem.setId(orderId);
+    orderLineItemRepository.save(orderLineItem);
+
+    return orderLineItem;
   }
 
   public OrderLineItem deleteOrderLineItem(long orderId, long orderLineId) {

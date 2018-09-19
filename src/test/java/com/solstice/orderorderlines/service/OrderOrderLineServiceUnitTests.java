@@ -99,59 +99,59 @@ public class OrderOrderLineServiceUnitTests {
   }
 
   @Test
-  public void createOrder_ValidJson_ReturnsCreatedOrder() throws IOException {
+  public void createOrder_ValidJson_ReturnsCreatedOrder() {
     Order order1 = getOrder1();
     when(productClient.getProductById(1)).thenReturn(getTestProduct());
     when(productClient.getProductById(3)).thenReturn(new Product("Testing",0.50));
-    Order order = orderOrderLineService.createOrder(toJson(order1));
+    Order order = orderOrderLineService.createOrder(order1);
     assertThatOrdersAreEqual(order, order1);
   }
 
   @Test
-  public void createOrder_ProductServiceIsDown_TotalPriceIsZero() throws IOException {
+  public void createOrder_ProductServiceIsDown_TotalPriceIsZero() {
     Order order1 = getOrder1();
     when(productClient.getProductById(anyLong())).thenReturn(new Product("",0));
-    Order order = orderOrderLineService.createOrder(toJson(order1));
+    Order order = orderOrderLineService.createOrder(order1);
     assertThat(order, is(notNullValue()));
     assertThat(order.getTotalPrice(), is(0.0));
   }
 
-  @Test(expected = IOException.class)
-  public void createOrder_InvalidJson_ThrowsIOException() throws IOException {
-    orderOrderLineService.createOrder("{wrong)");
-  }
+//  @Test(expected = IOException.class)
+//  public void createOrder_InvalidJson_ThrowsIOException() {
+//    orderOrderLineService.createOrder("{wrong)");
+//  }
 
   @Test
-  public void updateOrder_ValidIdAndJson_ReturnsOrder() throws IOException {
+  public void updateOrder_ValidIdAndJson_ReturnsOrder() {
     Order order1 = getOrder1();
     when(orderRepository.findByOrderNumber(1)).thenReturn(order1);
     when(productClient.getProductById(1)).thenReturn(getTestProduct());
     when(productClient.getProductById(3)).thenReturn(new Product("Testing",0.50));
-    Order order = orderOrderLineService.updateOrder(1, toJson(order1));
+    Order order = orderOrderLineService.updateOrder(1, order1);
     logger.debug(order.toString());
     logger.debug(order1.toString());
     assertThatOrdersAreEqual(order, order1);
   }
 
   @Test
-  public void updateOrder_ProductServiceIsDown_TotalPriceIsZero() throws IOException {
+  public void updateOrder_ProductServiceIsDown_TotalPriceIsZero() {
     Order order1 = getOrder1();
     when(orderRepository.findByOrderNumber(1)).thenReturn(order1);
     when(productClient.getProductById(anyLong())).thenReturn(new Product("",0.0));
-    Order order = orderOrderLineService.updateOrder(1, toJson(order1));
+    Order order = orderOrderLineService.updateOrder(1, order1);
     assertThat(order, is(notNullValue()));
     assertThat(order.getTotalPrice(), is(0.0));
   }
 
   @Test
-  public void updateOrder_InvalidIdAndValidJson_ReturnsNull() throws IOException {
-    assertThat(orderOrderLineService.updateOrder(2, toJson(getOrder1())), is(nullValue()));
+  public void updateOrder_InvalidIdAndValidJson_ReturnsNull() {
+    assertThat(orderOrderLineService.updateOrder(2, getOrder1()), is(nullValue()));
   }
 
-  @Test(expected = IOException.class)
-  public void updateOrder_ValidIdAndInvalidJson_ThrowsIOException() throws IOException {
-    orderOrderLineService.updateOrder(1, "{wrong format)");
-  }
+//  @Test(expected = IOException.class)
+//  public void updateOrder_ValidIdAndInvalidJson_ThrowsIOException() {
+//    orderOrderLineService.updateOrder(1, "{wrong format)");
+//  }
 
   @Test
   public void deleteOrder_ValidId_ReturnDeletedOrder() {
@@ -195,59 +195,21 @@ public class OrderOrderLineServiceUnitTests {
   }
 
   @Test
-  public void createOrderLineItem_ValidIdAndJson_ReturnsCreatedOrder() throws IOException {
+  public void createOrderLineItem_ValidIdAndJson_ReturnsCreatedOrder() {
     OrderLineItem orderLineItem1 = getOrderLineItem1();
     when(orderRepository.findByOrderNumber(1)).thenReturn(getOrder1());
     when(productClient.getProductById(anyLong())).thenReturn(getTestProduct());
-    OrderLineItem orderLineItem = orderOrderLineService.createOrderLineItem(1, toJson(orderLineItem1));
+    OrderLineItem orderLineItem = orderOrderLineService.createOrderLineItem(1, orderLineItem1);
 
     assertThatOrderLineItemsAreEqual(orderLineItem, orderLineItem1);
   }
 
   @Test
-  public void createOrderLineItem_ProductServiceIsDown_TotalPriceIsZero() throws IOException {
+  public void createOrderLineItem_ProductServiceIsDown_TotalPriceIsZero() {
     OrderLineItem orderLineItem1 = getOrderLineItem1();
     when(orderRepository.findByOrderNumber(1)).thenReturn(getOrder1());
     when(productClient.getProductById(anyLong())).thenReturn(new Product("", 0.0));
-    OrderLineItem orderLineItem = orderOrderLineService.createOrderLineItem(1, toJson(orderLineItem1));
-
-    assertThat(orderLineItem, is(notNullValue()));
-    assertThat(orderLineItem.getPrice(), is(0.0));
-    assertThat(orderLineItem.getTotalPrice(), is(0.0));
-  }
-
-  @Test(expected = IOException.class)
-  public void createOrderLineItem_InvalidJson_ThrowsIOException() throws IOException {
-    when(orderRepository.findByOrderNumber(1)).thenReturn(getOrder1());
-    orderOrderLineService.createOrderLineItem(1, "{wrong)");
-  }
-
-  @Test
-  public void createOrderLineItem_InvalidId_ReturnsNull() throws IOException {
-    assertThat(orderOrderLineService.createOrderLineItem(2, toJson(getOrderLineItem1())), is(nullValue()));
-  }
-
-
-  @Test
-  public void updateOrderLineItem_ValidIdAndJson_ReturnsOrder() throws IOException {
-    OrderLineItem orderLineItem1 = getOrderLineItem1();
-    when(orderLineItemRepository.findOrderLineItemByIdAndOrderId(1, 1))
-        .thenReturn(orderLineItem1);
-    when(productClient.getProductById(anyLong())).thenReturn(getTestProduct());
-    OrderLineItem orderLineItem = orderOrderLineService
-        .updateOrderLineItem(1, 1, toJson(orderLineItem1));
-
-    assertThatOrderLineItemsAreEqual(orderLineItem, orderLineItem1);
-  }
-
-  @Test
-  public void updateOrderLineItem_ProductServiceIsDown_TotalPriceIsZero() throws IOException {
-    OrderLineItem orderLineItem1 = getOrderLineItem1();
-    when(orderLineItemRepository.findOrderLineItemByIdAndOrderId(1, 1))
-        .thenReturn(orderLineItem1);
-    when(productClient.getProductById(anyLong())).thenReturn(new Product("", 0.0));
-    OrderLineItem orderLineItem = orderOrderLineService
-        .updateOrderLineItem(1, 1, toJson(orderLineItem1));
+    OrderLineItem orderLineItem = orderOrderLineService.createOrderLineItem(1, orderLineItem1);
 
     assertThat(orderLineItem, is(notNullValue()));
     assertThat(orderLineItem.getPrice(), is(0.0));
@@ -255,16 +217,48 @@ public class OrderOrderLineServiceUnitTests {
   }
 
   @Test
-  public void updateOrderLineItem_InvalidIdAndValidJson_ReturnsNull() throws IOException {
+  public void createOrderLineItem_InvalidId_ReturnsNull() {
+    assertThat(orderOrderLineService.createOrderLineItem(-1, getOrderLineItem1()), is(nullValue()));
+  }
+
+
+  @Test
+  public void updateOrderLineItem_ValidIdAndJson_ReturnsOrder() {
+    OrderLineItem orderLineItem1 = getOrderLineItem1();
+    when(orderLineItemRepository.findOrderLineItemByIdAndOrderId(1, 1))
+        .thenReturn(orderLineItem1);
+    when(productClient.getProductById(anyLong())).thenReturn(getTestProduct());
+    OrderLineItem orderLineItem = orderOrderLineService
+        .updateOrderLineItem(1, 1, orderLineItem1);
+
+    assertThatOrderLineItemsAreEqual(orderLineItem, orderLineItem1);
+  }
+
+  @Test
+  public void updateOrderLineItem_ProductServiceIsDown_TotalPriceIsZero() {
+    OrderLineItem orderLineItem1 = getOrderLineItem1();
+    when(orderLineItemRepository.findOrderLineItemByIdAndOrderId(1, 1))
+        .thenReturn(orderLineItem1);
+    when(productClient.getProductById(anyLong())).thenReturn(new Product("", 0.0));
+    OrderLineItem orderLineItem = orderOrderLineService
+        .updateOrderLineItem(1, 1, orderLineItem1);
+
+    assertThat(orderLineItem, is(notNullValue()));
+    assertThat(orderLineItem.getPrice(), is(0.0));
+    assertThat(orderLineItem.getTotalPrice(), is(0.0));
+  }
+
+  @Test
+  public void updateOrderLineItem_InvalidIdAndValidJson_ReturnsNull() {
     assertThat(orderOrderLineService
-        .updateOrderLineItem(3, 2, toJson(getOrderLineItem1())), is(nullValue()));
+        .updateOrderLineItem(3, 2, getOrderLineItem1()), is(nullValue()));
   }
 
-  @Test(expected = IOException.class)
-  public void updateOrderLineItem_ValidIdAndInvalidJson_ThrowsIOException() throws IOException {
-    when(orderLineItemRepository.findOrderLineItemByIdAndOrderId(1,1)).thenReturn(getOrderLineItem1());
-    orderOrderLineService.updateOrderLineItem(1, 1, "{wrong format)");
-  }
+//  @Test(expected = IOException.class)
+//  public void updateOrderLineItem_ValidIdAndInvalidJson_ThrowsIOException() {
+//    when(orderLineItemRepository.findOrderLineItemByIdAndOrderId(1,1)).thenReturn(getOrderLineItem1());
+//    orderOrderLineService.updateOrderLineItem(1, 1, "{wrong format)");
+//  }
 
   @Test
   public void deleteOrderLineItem_ValidId_ReturnDeletedOrder() {
