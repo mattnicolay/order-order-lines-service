@@ -130,15 +130,6 @@ public class OrderOrderLineControllerUnitTests {
   public void putOrderEmptyBodyTest() throws Exception {
     mockMvcPerform(PUT, "/orders/1", 400, "");
   }
-
-  @Test
-  public void updateOrder_InvalidJson_Code400() throws Exception {
-    when(orderOrderLineService.updateOrder(anyLong(), any(Order.class)))
-        .thenThrow(new IOException());
-    mockMvcPerform(PUT, "/orders/1", "{wrong}", 400, "<h1>ERROR:</h1>\n"
-        + " Invalid Json format");
-  }
-
   @Test
   public void deleteOrderSuccessTest() throws Exception {
     when(orderOrderLineService.deleteOrder(anyLong())).thenReturn(new Order());
