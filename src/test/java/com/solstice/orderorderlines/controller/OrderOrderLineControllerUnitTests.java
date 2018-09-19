@@ -1,9 +1,7 @@
 package com.solstice.orderorderlines.controller;
 
-import static org.junit.Assert.fail;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -117,13 +115,6 @@ public class OrderOrderLineControllerUnitTests {
     mockMvcPerform(POST, "/orders", 400, "");
   }
 
-//  @Test
-//  public void createOrder_InvalidJson_Code400() throws Exception {
-//    when(orderOrderLineService.createOrder(anyString())).thenThrow(new IOException());
-//    mockMvcPerform(POST, "/orders", "{wrong}", 400, "<h1>ERROR:</h1>\n"
-//        + " Invalid Json format");
-//  }
-
   @Test
   public void putOrderSuccessTest() throws Exception {
     when(orderOrderLineService.updateOrder(anyLong(), any(Order.class))).thenReturn(new Order());
@@ -189,13 +180,6 @@ public class OrderOrderLineControllerUnitTests {
     mockMvcPerform(POST, "/orders/1/lines", 400, "");
   }
 
-//  @Test
-//  public void createOrderLine_InvalidJson_Code400() throws Exception {
-//    when(orderOrderLineService.createOrderLineItem(1, "{wrong}")).thenThrow(new IOException());
-//    mockMvcPerform(POST, "/orders/1/lines", "{wrong}", 400, "<h1>ERROR:</h1>\n"
-//        + " Invalid Json format");
-//  }
-
   @Test
   public void putOrderLineSuccessTest() throws Exception {
     when(orderOrderLineService.updateOrderLineItem(anyLong(), anyLong(), any(OrderLineItem.class)))
@@ -213,13 +197,6 @@ public class OrderOrderLineControllerUnitTests {
   public void putOrderLineEmptyBodyTest() throws Exception {
     mockMvcPerform(PUT, "/orders/1/lines/1", 400, "");
   }
-
-//  @Test
-//  public void updateOrderLine_InvalidJson_Code400() throws Exception {
-//    when(orderOrderLineService.updateOrderLineItem(1, 1, "{wrong}")).thenThrow(new IOException());
-//    mockMvcPerform(PUT, "/orders/1/lines/1", "{wrong}", 400, "<h1>ERROR:</h1>\n"
-//        + " Invalid Json format");
-//  }
 
   @Test
   public void deleteOrderLineSuccessTest() throws Exception {

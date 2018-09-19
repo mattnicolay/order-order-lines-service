@@ -116,11 +116,6 @@ public class OrderOrderLineServiceUnitTests {
     assertThat(order.getTotalPrice(), is(0.0));
   }
 
-//  @Test(expected = IOException.class)
-//  public void createOrder_InvalidJson_ThrowsIOException() {
-//    orderOrderLineService.createOrder("{wrong)");
-//  }
-
   @Test
   public void updateOrder_ValidIdAndJson_ReturnsOrder() {
     Order order1 = getOrder1();
@@ -147,11 +142,6 @@ public class OrderOrderLineServiceUnitTests {
   public void updateOrder_InvalidIdAndValidJson_ReturnsNull() {
     assertThat(orderOrderLineService.updateOrder(2, getOrder1()), is(nullValue()));
   }
-
-//  @Test(expected = IOException.class)
-//  public void updateOrder_ValidIdAndInvalidJson_ThrowsIOException() {
-//    orderOrderLineService.updateOrder(1, "{wrong format)");
-//  }
 
   @Test
   public void deleteOrder_ValidId_ReturnDeletedOrder() {
@@ -253,12 +243,6 @@ public class OrderOrderLineServiceUnitTests {
     assertThat(orderOrderLineService
         .updateOrderLineItem(3, 2, getOrderLineItem1()), is(nullValue()));
   }
-
-//  @Test(expected = IOException.class)
-//  public void updateOrderLineItem_ValidIdAndInvalidJson_ThrowsIOException() {
-//    when(orderLineItemRepository.findOrderLineItemByIdAndOrderId(1,1)).thenReturn(getOrderLineItem1());
-//    orderOrderLineService.updateOrderLineItem(1, 1, "{wrong format)");
-//  }
 
   @Test
   public void deleteOrderLineItem_ValidId_ReturnDeletedOrder() {

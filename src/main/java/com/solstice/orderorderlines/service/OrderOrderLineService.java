@@ -1,7 +1,5 @@
 package com.solstice.orderorderlines.service;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.netflix.hystrix.contrib.javanica.annotation.HystrixCommand;
 import com.solstice.orderorderlines.dao.OrderLineItemRepository;
 import com.solstice.orderorderlines.dao.OrderRepository;
 import com.solstice.orderorderlines.external.AccountAddressClient;
@@ -14,7 +12,6 @@ import com.solstice.orderorderlines.model.OrderLineItem;
 import com.solstice.orderorderlines.model.OrderLineSummary;
 import com.solstice.orderorderlines.model.Product;
 import com.solstice.orderorderlines.model.Shipment;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -32,7 +29,6 @@ public class OrderOrderLineService {
   private AccountAddressClient accountAddressClient;
   private ProductClient productClient;
   private ShipmentClient shipmentClient;
-  private ObjectMapper objectMapper;
 
   public OrderOrderLineService(
       OrderLineItemRepository orderLineItemRepository,
@@ -45,7 +41,6 @@ public class OrderOrderLineService {
     this.accountAddressClient = accountAddressClient;
     this.productClient = productClient;
     this.shipmentClient = shipmentClient;
-    objectMapper = new ObjectMapper();
   }
 
   public List<Order> getOrders() {
