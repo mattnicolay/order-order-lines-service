@@ -45,7 +45,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 @WebMvcTest(OrderOrderLineController.class)
 public class OrderOrderLineControllerUnitTests {
 
-  private Logger logger = LoggerFactory.getLogger(OrderOrderLineControllerUnitTests.class);
+  private Logger logger = LoggerFactory.getLogger(this.getClass());
   private final String GET = "GET";
   private final String POST = "POST";
   private final String PUT = "PUT";
