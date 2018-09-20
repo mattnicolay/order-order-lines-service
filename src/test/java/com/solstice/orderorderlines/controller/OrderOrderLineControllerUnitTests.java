@@ -13,7 +13,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.solstice.orderorderlines.exception.OrderOrderLineExceptionHandler;
 import com.solstice.orderorderlines.model.Address;
 import com.solstice.orderorderlines.model.Order;
 import com.solstice.orderorderlines.model.OrderDetail;
@@ -22,7 +21,6 @@ import com.solstice.orderorderlines.model.OrderLineSummary;
 import com.solstice.orderorderlines.model.Product;
 import com.solstice.orderorderlines.model.Shipment;
 import com.solstice.orderorderlines.service.OrderOrderLineService;
-import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -60,8 +58,7 @@ public class OrderOrderLineControllerUnitTests {
 
   @Before
   public void setup() {
-    mockMvc = MockMvcBuilders.standaloneSetup(orderOrderLineController)
-        .setControllerAdvice(new OrderOrderLineExceptionHandler()).build();
+    mockMvc = MockMvcBuilders.standaloneSetup(orderOrderLineController).build();
   }
 
 
@@ -73,7 +70,7 @@ public class OrderOrderLineControllerUnitTests {
 
   @Test
   public void getOrdersFailureTest() throws Exception {
-    mockMvcPerform(GET, "/orders", 404, "[]");
+    mockMvcPerform(GET, "/orders", 404, "Resource not found");
   }
 
   @Test
@@ -83,8 +80,8 @@ public class OrderOrderLineControllerUnitTests {
   }
 
   @Test
-  public void getOrdersByAccountId_InvalidId_Code404EmptyResponse() throws Exception {
-    mockMvcPerform(GET, "/orders?accountId=-1", 404, "[]");
+  public void getOrdersByAccountId_InvalidId_Code404() throws Exception {
+    mockMvcPerform(GET, "/orders?accountId=-1", 404, "Resource not found");
   }
 
   @Test
@@ -94,8 +91,8 @@ public class OrderOrderLineControllerUnitTests {
   }
 
   @Test
-  public void getOrderDetails_InvalidId_Code404EmptyResponse() throws Exception {
-    mockMvcPerform(GET, "/orders/-1", 404, "[]");
+  public void getOrderDetails_InvalidId_Code404() throws Exception {
+    mockMvcPerform(GET, "/orders/-1", 404, "Resource not found");
   }
 
 
@@ -107,7 +104,7 @@ public class OrderOrderLineControllerUnitTests {
 
   @Test
   public void postOrderFailureTest() throws Exception {
-    mockMvcPerform(POST, "/orders", toJson(new Order()), 500, "");
+    mockMvcPerform(POST, "/orders", toJson(new Order()), 400, "Could not create order");
   }
 
   @Test
@@ -123,7 +120,7 @@ public class OrderOrderLineControllerUnitTests {
 
   @Test
   public void putOrderNotFoundTest() throws Exception {
-    mockMvcPerform(PUT, "/orders/1", toJson(new Order()), 404, "");
+    mockMvcPerform(PUT, "/orders/1", toJson(new Order()), 404, "Resource not found");
   }
 
   @Test
@@ -138,7 +135,7 @@ public class OrderOrderLineControllerUnitTests {
 
   @Test
   public void deleteOrderNotFoundTest() throws Exception {
-    mockMvcPerform(DELETE, "/orders/1", 404, "");
+    mockMvcPerform(DELETE, "/orders/1", 404, "Resource not found");
   }
 
   @Test
@@ -150,7 +147,7 @@ public class OrderOrderLineControllerUnitTests {
 
   @Test
   public void getOrderLinesNotFoundTest() throws Exception {
-    mockMvcPerform(GET, "/orders/1/lines", 404, "[]");
+    mockMvcPerform(GET, "/orders/1/lines", 404, "Resource not found");
   }
 
   @Test
@@ -163,7 +160,7 @@ public class OrderOrderLineControllerUnitTests {
 
   @Test
   public void postOrderLineFailureTest() throws Exception {
-    mockMvcPerform(POST, "/orders/1/lines", toJson(new OrderLineItem()), 500, "");
+    mockMvcPerform(POST, "/orders/1/lines", toJson(new OrderLineItem()), 400, "Could not create order line item");
   }
 
   @Test
@@ -181,7 +178,7 @@ public class OrderOrderLineControllerUnitTests {
 
   @Test
   public void putOrderLineNotFoundTest() throws Exception {
-    mockMvcPerform(PUT, "/orders/1/lines/1", toJson(new OrderLineItem()), 404, "");
+    mockMvcPerform(PUT, "/orders/1/lines/1", toJson(new OrderLineItem()), 404, "Resource not found");
   }
 
   @Test
@@ -198,7 +195,7 @@ public class OrderOrderLineControllerUnitTests {
 
   @Test
   public void deleteOrderLineNotFoundTest() throws Exception {
-    mockMvcPerform(DELETE, "/orders/1/lines/1", 404, "");
+    mockMvcPerform(DELETE, "/orders/1/lines/1", 404, "Resource not found");
   }
 
   private String toJson(Object value) {

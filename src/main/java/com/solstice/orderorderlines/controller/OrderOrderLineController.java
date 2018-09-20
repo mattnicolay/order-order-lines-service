@@ -1,13 +1,13 @@
 package com.solstice.orderorderlines.controller;
 
+import com.solstice.orderorderlines.exception.HTTP400Exception;
+import com.solstice.orderorderlines.exception.HTTP404Exception;
 import com.solstice.orderorderlines.model.Order;
 import com.solstice.orderorderlines.model.OrderDetail;
 import com.solstice.orderorderlines.model.OrderLineItem;
 import com.solstice.orderorderlines.service.OrderOrderLineService;
 import java.util.List;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -16,11 +16,13 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/orders")
-public class OrderOrderLineController {
+public class OrderOrderLineController extends AbstractRestController{
 
   private OrderOrderLineService orderOrderLineService;
 
@@ -29,102 +31,83 @@ public class OrderOrderLineController {
   }
 
   @GetMapping
-  public ResponseEntity<List<Order>> getOrders(
+  public @ResponseBody List<Order> getOrders(
       @RequestParam(value = "accountId", required = false) Long accountId) {
     List<Order> orders;
     orders = accountId != null ? orderOrderLineService.getOrdersByAccountId(accountId)
         : orderOrderLineService.getOrders();
-    return new ResponseEntity<>(
-        orders,
-        new HttpHeaders(),
-        orders.isEmpty() ? HttpStatus.NOT_FOUND : HttpStatus.OK
-    );
+    if (orders.isEmpty()) {
+      throw new HTTP404Exception("Resource not found");
+    }
+    return orders;
   }
 
   @PostMapping
-  public ResponseEntity<Order> createOrder(@RequestBody Order body) {
+  @ResponseStatus(HttpStatus.CREATED)
+  public @ResponseBody Order createOrder(@RequestBody Order body) {
     Order order = orderOrderLineService.createOrder(body);
-    return new ResponseEntity<>(
-        order,
-        new HttpHeaders(),
-        order == null ? HttpStatus.INTERNAL_SERVER_ERROR : HttpStatus.CREATED
-    );
+    if (order == null) {
+      throw new HTTP400Exception("Could not create order");
+    }
+    return order;
   }
 
   @GetMapping("/{accountId}")
-  public ResponseEntity<List<OrderDetail>> getOrderDetails(@PathVariable("accountId") long accountId) {
+  public @ResponseBody List<OrderDetail> getOrderDetails(@PathVariable("accountId") long accountId) {
     List<OrderDetail> orderDetails = orderOrderLineService.getOrderDetails(accountId);
-    return new ResponseEntity<>(
-        orderDetails,
-        new HttpHeaders(),
-        orderDetails.isEmpty() ? HttpStatus.NOT_FOUND : HttpStatus.OK
-    );
+    if (orderDetails.isEmpty()) {
+      throw new HTTP404Exception("Resource not found");
+    }
+    return orderDetails;
   }
 
   @PutMapping("/{id}")
-  public ResponseEntity<Order> updateOrder(@PathVariable("id") long id, @RequestBody Order body) {
+  public @ResponseBody Order updateOrder(@PathVariable("id") long id, @RequestBody Order body) {
     Order order = orderOrderLineService.updateOrder(id, body);
-    return new ResponseEntity<>(
-        order,
-        new HttpHeaders(),
-        order == null ? HttpStatus.NOT_FOUND : HttpStatus.OK
-    );
+    return AbstractRestController.checkResourceFound(order);
   }
 
   @DeleteMapping("/{id}")
-  public ResponseEntity<Order> deleteOrder(@PathVariable("id") long id) {
+  public @ResponseBody Order deleteOrder(@PathVariable("id") long id) {
     Order order = orderOrderLineService.deleteOrder(id);
-    return new ResponseEntity<>(
-        order,
-        new HttpHeaders(),
-        order == null ? HttpStatus.NOT_FOUND : HttpStatus.OK
-    );
+    return AbstractRestController.checkResourceFound(order);
   }
 
   @GetMapping("/{id}/lines")
-  public ResponseEntity<List<OrderLineItem>> getOrderLineItems(@PathVariable("id") long id) {
+  public @ResponseBody List<OrderLineItem> getOrderLineItems(@PathVariable("id") long id) {
     List<OrderLineItem> orderLineItems = orderOrderLineService.getOrderLineItems(id);
-    return new ResponseEntity<>(
-        orderLineItems,
-        new HttpHeaders(),
-        orderLineItems.isEmpty() ? HttpStatus.NOT_FOUND : HttpStatus.OK
-    );
+    if(orderLineItems.isEmpty()) {
+      throw new HTTP404Exception("Resource not found");
+    }
+    return orderLineItems;
   }
 
   @PostMapping("/{id}/lines")
-  public ResponseEntity<OrderLineItem> createOrderLineItem(
+  @ResponseStatus(HttpStatus.CREATED)
+  public @ResponseBody OrderLineItem createOrderLineItem(
       @PathVariable("id") long id,
       @RequestBody OrderLineItem body) {
     OrderLineItem orderLineItem = orderOrderLineService.createOrderLineItem(id, body);
-    return new ResponseEntity<>(
-        orderLineItem,
-        new HttpHeaders(),
-        orderLineItem == null ? HttpStatus.INTERNAL_SERVER_ERROR : HttpStatus.CREATED
-    );
+    if (orderLineItem == null) {
+      throw new HTTP400Exception("Could not create order line item");
+    }
+    return orderLineItem;
   }
 
   @PutMapping("/{orderId}/lines/{orderLineId}")
-  public ResponseEntity<OrderLineItem> updateOrderLineItem(
+  public @ResponseBody OrderLineItem updateOrderLineItem(
       @PathVariable("orderId") long orderId,
       @PathVariable("orderLineId") long orderLineId,
       @RequestBody OrderLineItem body) {
     OrderLineItem orderLineItem = orderOrderLineService.updateOrderLineItem(orderId, orderLineId, body);
-    return new ResponseEntity<>(
-        orderLineItem,
-        new HttpHeaders(),
-        orderLineItem == null ? HttpStatus.NOT_FOUND : HttpStatus.OK
-    );
+    return AbstractRestController.checkResourceFound(orderLineItem);
   }
 
   @DeleteMapping("/{orderId}/lines/{orderLineId}")
-  public ResponseEntity<OrderLineItem> deleteOrderLineItem(
+  public @ResponseBody OrderLineItem deleteOrderLineItem(
       @PathVariable("orderId") long orderId,
       @PathVariable("orderLineId") long orderLineId) {
     OrderLineItem orderLineItem = orderOrderLineService.deleteOrderLineItem(orderId, orderLineId);
-    return new ResponseEntity<>(
-        orderLineItem,
-        new HttpHeaders(),
-        orderLineItem == null ? HttpStatus.NOT_FOUND : HttpStatus.OK
-    );
+    return AbstractRestController.checkResourceFound(orderLineItem);
   }
 }
