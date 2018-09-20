@@ -421,12 +421,11 @@ public class OrderOrderLineServiceUnitTests {
     ));
     when(accountAddressClient.getAddressByAccountIdAndAddressId(anyLong(), anyLong()))
         .thenReturn(address);
-    when(shipmentClient.getShipmentById(anyLong())).thenReturn(new Shipment());
 
     List<OrderDetail> orderDetails = orderOrderLineService.getOrderDetails(1);
     assertThat(orderDetails, is(notNullValue()));
     assertFalse(orderDetails.isEmpty());
-    orderDetails.get(0).getShipments().forEach(shipment -> assertThat(shipment, is(notNullValue())));
+    assertTrue(orderDetails.get(0).getShipments().isEmpty());
   }
 
   @Test

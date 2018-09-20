@@ -1,5 +1,6 @@
 package com.solstice.orderorderlines.service;
 
+import com.netflix.hystrix.contrib.javanica.annotation.HystrixCommand;
 import com.solstice.orderorderlines.dao.OrderLineItemRepository;
 import com.solstice.orderorderlines.dao.OrderRepository;
 import com.solstice.orderorderlines.external.AccountAddressClient;
@@ -121,26 +122,14 @@ public class OrderOrderLineService {
     List<OrderDetail> orderDetails = new ArrayList<>();
     List<Order> orders = orderRepository.findAllByAccountIdOrderByOrderDate(accountId);
 
-    orders.forEach(order -> {
-
+    for (Order order : orders) {
       Address address = accountAddressClient.getAddressByAccountIdAndAddressId(
           order.getAccountId(), order.getShippingAddressId());
       logger.info("Address from feign client: {}", address);
       List<OrderLineItem> orderLineItems = orderRepository
           .findOrderLineItemsByOrderNumber(order.getOrderNumber());
 
-      List<Shipment> shipments = new ArrayList<>();
-      orderLineItems.forEach(orderLineItem -> {
-          Shipment shipment = shipmentClient.getShipmentById(orderLineItem.getShipmentId());
-          logger.info("Shipment from feign client: {}", shipment);
-          shipment.setOrderLineItems(getOrderLineSummaries(
-              orderLineItems
-                  .stream()
-                  .filter(o -> o.getShipmentId() == shipment.getId())
-                  .collect(Collectors.toList()))
-          );
-          shipments.add(shipment);
-      });
+      List<Shipment> shipments = getShipmentsForOrderLineItems(orderLineItems);
 
       orderDetails.add(new OrderDetail(
           order.getOrderNumber(),
@@ -149,9 +138,30 @@ public class OrderOrderLineService {
           getOrderLineSummaries(orderLineItems),
           shipments
       ));
-    });
+    }
 
     return orderDetails;
+  }
+
+  @HystrixCommand(fallbackMethod = "getShipmentsFallback")
+  private List<Shipment> getShipmentsForOrderLineItems(List<OrderLineItem> orderLineItems) {
+    List<Shipment> shipments = new ArrayList<>();
+    for (OrderLineItem orderLineItem : orderLineItems) {
+      Shipment shipment = shipmentClient.getShipmentById(orderLineItem.getShipmentId());
+      logger.info("Shipment from feign client: {}", shipment);
+      shipment.setOrderLineItems(getOrderLineSummaries(
+          orderLineItems
+              .stream()
+              .filter(o -> o.getShipmentId() == shipment.getId())
+              .collect(Collectors.toList()))
+      );
+      shipments.add(shipment);
+    }
+    return shipments;
+  }
+
+  private List<Shipment> getShipmentsFallback(List<OrderLineItem> orderLineItems) {
+    return new ArrayList<>();
   }
 
   private void setPrices(Order order) {
